@@ -10,7 +10,7 @@ export const deleteGroup = async (id:any) => {
   return response.data;
 };
 export const updateGroup = async (id:any,data:any) => {
-  const response = await api.patch("/organization/groups",id);
+  const response = await api.patch("/organization/groups",id,data);
   return response.data;
 };
 

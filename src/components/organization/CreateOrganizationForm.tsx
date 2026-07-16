@@ -25,7 +25,7 @@ export default function CreateOrganization() {
 
   const [logo, setLogo] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-
+  loading
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
       ...prev,

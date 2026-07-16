@@ -1,4 +1,4 @@
-import Login2 from "../components/login2";
+
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 
