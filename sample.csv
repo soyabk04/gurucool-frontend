@@ -1,0 +1,11 @@
+name,email,ID,role,groupCode
+John Doe,john.doe@example.com,EMP001,user,ENG
+Jane Smith,jane.smith@example.com,EMP002,user,ENG
+Alice Johnson,alice.johnson@example.com,EMP003,coordinator,HR
+Bob Williams,bob.williams@example.com,EMP004,user,HR
+Charlie Brown,charlie.brown@example.com,EMP005,admin,ADMIN
+Emily Davis,emily.davis@example.com,EMP006,user,SALES
+Michael Wilson,michael.wilson@example.com,EMP007,user,SALES
+Sophia Taylor,sophia.taylor@example.com,EMP008,user,IT
+David Anderson,david.anderson@example.com,EMP009,coordinator,IT
+Olivia Thomas,olivia.thomas@example.com,EMP010,user,FIN
