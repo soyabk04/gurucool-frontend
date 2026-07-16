@@ -7,6 +7,5 @@ export const createOrg = async (data: any) => {
 
 export const getOrg = async () => {
   const response = await api.get("/organization/org");
-  console.log(response)
   return response.data;
 };

@@ -9,6 +9,10 @@ import OrganizationPage from "@/pages/OrganizationPage"
 import GroupPage from "@/pages/GroupPage";
 import UserPage from "@/pages/UserPage";
 import CreateUserPage from "@/pages/CreateUserPage";
+import CreateCourse from "@/pages/courses/CreateCourse";
+import CourseEditor from "@/pages/courses/CourseEditor";
+import AssignOrganizationCourse from "@/pages/superadmin/AssignOrganizationCourse";
+import AssignGroupCourse from "@/pages/admin/AssignOrganizationCourse";
 
 export default function AppRoutes() {
   return (
@@ -63,6 +67,17 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+                    <Route
+        path="/Course"
+        element={
+          <ProtectedRoute>
+            < CreateCourse/>
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/courses/:courseId/edit" element={<CourseEditor />} />
+      <Route path="/courses/assignOrg" element={<AssignOrganizationCourse />} />
+      <Route path="/courses/assigngrp" element={<AssignGroupCourse />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

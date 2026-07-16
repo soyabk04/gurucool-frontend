@@ -47,9 +47,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       password,
     });
 
-    console.log(data);
+    console.log();
+    const user=data.user.toString()
+    localStorage.setItem("user", user);  
 
-    window.location.href = "/dashboard";
+    // window.location.href = "/dashboard";
   } catch (err: any) {
     alert(err.response?.data?.message || "Login failed");
   } finally {
