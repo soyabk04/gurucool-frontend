@@ -12,6 +12,5 @@ export const assignCourseToOrganization = async (data: {
 
 export const getOrganizationCourses = async () => {
   const res = await api.get("/courses/enroll/org");
-  console.log(res)
   return res.data;
 };

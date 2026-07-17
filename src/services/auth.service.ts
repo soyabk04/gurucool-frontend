@@ -1,11 +1,27 @@
 import { api } from "@/api/axios";
 
+export type UserRole = "user" | "superadmin" | "admin" | "coordinator";
+
+export interface AuthUser {
+  userId?: string;
+  name?: string;
+  role: UserRole;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
-export const login = async (data: LoginRequest) => {
+export interface LoginResponse {
+  success: boolean;
+  user: {
+    name: string;
+    role: UserRole;
+  };
+}
+
+export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post("/auth/login", data);
   return response.data;
 };
@@ -15,19 +31,20 @@ export const logout = async () => {
   return response.data;
 };
 
-export const me = async () => {
-  const response = await api.get("/auth/me");
+// Backend has no dedicated `/auth/me` route — `/auth/isloggedin` already
+// verifies the session cookie via authMiddleware *and* returns the decoded
+// {userId, role} payload, so it doubles as the "who am I" endpoint.
+export const me = async (): Promise<{ success: boolean; user: AuthUser }> => {
+  const response = await api.get("/auth/isloggedin");
   return response.data;
 };
 
-export const checklogin=async ()=>{
+export const checklogin = async () => {
   const response = await api.post("/auth/checklogin");
-  // console.log(response)
   return response.data;
-}
+};
 
-export const genAccessToken =async ()=>{
+export const genAccessToken = async () => {
   const response = await api.post("/auth/accesstoken");
-  console.log(response)
-   return response.data;
-}
+  return response.data;
+};

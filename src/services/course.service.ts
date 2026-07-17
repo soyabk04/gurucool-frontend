@@ -4,7 +4,6 @@ import type { Course, CreateCourse } from "@/types/course";
 export const createCourse = async (
   form: CreateCourse
 ): Promise<Course> => {
-    console.log(form)
 const formData = new FormData();
 
 formData.append(
@@ -31,13 +30,17 @@ if (form.thumbnail) {
 
   return response.data.course.course;
 };
+// Full course list — superadmin/admin only (matches GET /courses/cour on the backend).
 export const getCourses = async () => {
   const res = await api.get("/courses/cour");
- 
   return res.data;
 };
 export const getOrgCourses = async () => {
   const res = await api.get("/courses/orgcourses");
-  console.log("bou",res)
+  return res.data;
+};
+// Courses the current user has access to (any role) — matches GET /courses/mycourses.
+export const getMyCourses = async () => {
+  const res = await api.get("/courses/cour");
   return res.data;
 };

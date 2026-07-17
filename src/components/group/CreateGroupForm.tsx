@@ -56,7 +56,6 @@ export default function CreateGroup() {
           coordinatorId: "",
         });
 
-        console.log("Group created");
       }
     } catch (error) {
       console.error("Failed to create group:", error);

@@ -1,12 +1,5 @@
 import { useCallback, useState } from "react";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -163,108 +156,95 @@ export default function CreateUserPage() {
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <div className="container mx-auto space-y-6 p-6">
+      <div>
+        <h1 className="text-3xl font-bold">
+          Create Users
+        </h1>
 
-      <SidebarInset>
-        <header className="flex h-16 items-center border-b px-4">
-          <SidebarTrigger />
-          <h1 className="ml-4 text-xl font-semibold">
-            GuruCool
-          </h1>
-        </header>
+        <p className="text-muted-foreground">
+          Add users manually or upload a CSV file.
+        </p>
+      </div>
 
-        <main className="container mx-auto space-y-6 p-6">
-          <div>
-            <h1 className="text-3xl font-bold">
-              Create Users
-            </h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Add User</CardTitle>
+        </CardHeader>
 
-            <p className="text-muted-foreground">
-              Add users manually or upload a CSV file.
-            </p>
+        <CardContent>
+          <UserEntryForm onAdd={addUser} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Upload CSV</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <CsvUpload onUpload={addCsvUsers} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Pending Users ({pendingUsers.length})
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <PendingUsersTable
+            users={pendingUsers}
+            onRemove={removeUser}
+          />
+
+          <div className="flex justify-end">
+            <Button
+              disabled={
+                loading ||
+                pendingUsers.length === 0
+              }
+              onClick={handleCreateUsers}
+            >
+              {loading
+                ? "Creating..."
+                : `Create ${pendingUsers.length} User${
+                    pendingUsers.length > 1 ? "s" : ""
+                  }`}
+            </Button>
           </div>
+        </CardContent>
+      </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Add User</CardTitle>
-            </CardHeader>
+      {createdUsers.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Successfully Created ({createdUsers.length})
+            </CardTitle>
+          </CardHeader>
 
-            <CardContent>
-              <UserEntryForm onAdd={addUser} />
-            </CardContent>
-          </Card>
+          <CardContent>
+            <CreatedUsersTable users={createdUsers} />
+          </CardContent>
+        </Card>
+      )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload CSV</CardTitle>
-            </CardHeader>
+      {failedUsers.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Failed Users ({failedUsers.length})
+            </CardTitle>
+          </CardHeader>
 
-            <CardContent>
-              <CsvUpload onUpload={addCsvUsers} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Pending Users ({pendingUsers.length})
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-              <PendingUsersTable
-                users={pendingUsers}
-                onRemove={removeUser}
-              />
-
-              <div className="flex justify-end">
-                <Button
-                  disabled={
-                    loading ||
-                    pendingUsers.length === 0
-                  }
-                  onClick={handleCreateUsers}
-                >
-                  {loading
-                    ? "Creating..."
-                    : `Create ${pendingUsers.length} User${
-                        pendingUsers.length > 1 ? "s" : ""
-                      }`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {createdUsers.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Successfully Created ({createdUsers.length})
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent>
-                <CreatedUsersTable users={createdUsers} />
-              </CardContent>
-            </Card>
-          )}
-
-          {failedUsers.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Failed Users ({failedUsers.length})
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent>
-                <FailedUsersTable users={failedUsers} />
-              </CardContent>
-            </Card>
-          )}
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+          <CardContent>
+            <FailedUsersTable users={failedUsers} />
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

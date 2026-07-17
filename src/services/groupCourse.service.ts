@@ -12,6 +12,5 @@ export const assignCourseToGroup = async (data: {
 
 export const getGroupCourses = async () => {
   const res = await api.get("/courses/enroll/group");
- console.log(res.data.data)
   return res.data;
 };

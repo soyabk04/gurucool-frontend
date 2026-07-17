@@ -36,8 +36,8 @@ interface Course {
 }
 
 export default function AssignGroupForm() {
-    const [groups, setgroups] = useState<any[]>([]);
-    const [courses, setCourses] = useState<any[]>([]);
+    const [groups, setgroups] = useState<Group[]>([]);
+    const [courses, setCourses] = useState<Course[]>([]);
 
     const [groupId, setGroupId] = useState("");
     const [courseId, setCourseId] = useState("");
@@ -56,7 +56,6 @@ export default function AssignGroupForm() {
             // ]);
             const orgRes=await getGroups();
             const courseRes=await getOrgCourses()
-            console.log("cout",courseRes)
             setgroups(orgRes.res);
             setCourses(courseRes.res);
         } catch (err) {

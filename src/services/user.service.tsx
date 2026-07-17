@@ -2,13 +2,12 @@ import { api } from "@/api/axios";
 
 export const getUsers = async () => {
   const response = await api.get("/auth/getusers");
-  console.log(response.data)
+//   console.log(response)
   return response.data;
 };
 
 export const createUsers = async (data:any) => {
   const response = await api.post("/auth/createuser",data);
-  console.log(response.data)
   return response.data;
 };
 

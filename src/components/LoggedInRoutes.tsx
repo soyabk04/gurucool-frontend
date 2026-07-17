@@ -1,30 +1,21 @@
 import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { checklogin } from "@/services/auth.service";
+import { useAuth } from "@/context/AuthContext";
 
 type Props = {
   children: React.ReactNode;
 };
 
+// Used on routes like /login that a logged-in user shouldn't see again.
 export function LoggedInRoute({ children }: Props) {
-  const [loading, setLoading] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    async function verify() {
-      const res = await checklogin();
-      setAuthenticated(res.success);
-      setLoading(false);
-    }
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center text-muted-foreground">
+        Loading...
+      </div>
+    );
+  }
 
-    verify();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-
-  return authenticated ? (
-    <Navigate to="/dashboard" replace />
-  ) : (
-    <>{children}</>
-  );
+  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
 }

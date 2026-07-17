@@ -31,7 +31,6 @@ export default function CourseEditor() {
 
     try {
       const data = await getChapters(courseId);
-      console.log(data)
       setChapters(data);
     } catch (error) {
       console.error(error);

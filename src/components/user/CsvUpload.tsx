@@ -41,7 +41,6 @@ export default function CsvUpload({ onUpload }: Props) {
       const response = await uploadUserCsv(formData);
 
       if (response.success) {
-        console.log(response.data);
 
         onUpload(response.data);
 

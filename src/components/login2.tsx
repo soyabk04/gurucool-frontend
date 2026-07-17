@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { api } from "@/api/axios";
+import { login } from "@/services/auth.service";
+import { useAuth } from "@/context/AuthContext";
 
 interface Login2Props {
   heading?: string;
@@ -34,30 +36,29 @@ const Login2 = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
 
-  if (!email || !password) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
 
-  try {
-    setLoading(true);
+    if (!email || !password) return;
 
-    const { data } = await api.post("/auth/login", {
-      email,
-      password,
-    });
+    try {
+      setLoading(true);
 
-    console.log();
-    const user=data.user.toString()
-    localStorage.setItem("user", user);  
+      const { user } = await login({ email, password });
+      setUser(user);
 
-    // window.location.href = "/dashboard";
-  } catch (err: any) {
-    alert(err.response?.data?.message || "Login failed");
-  } finally {
-    setLoading(false);
-  }
-};
+      navigate("/dashboard", { replace: true });
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className={cn("h-screen bg-muted", className)}>
@@ -81,6 +82,12 @@ const handleSubmit = async (e: React.FormEvent) => {
               <h1 className="text-xl font-semibold text-center">
                 {heading}
               </h1>
+            )}
+
+            {error && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </p>
             )}
 
             <div className="flex flex-col gap-2">

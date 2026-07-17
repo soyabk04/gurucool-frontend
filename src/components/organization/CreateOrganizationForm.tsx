@@ -72,7 +72,6 @@ export default function CreateOrganization() {
       const response = await createOrg(formData);
 
       if (response.success) {
-        console.log("Organization created!");
 
         // Optional: Reset form
         setForm({

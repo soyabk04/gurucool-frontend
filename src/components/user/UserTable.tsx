@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { Button } from "@/components/ui/button";
 import { getUsers } from "@/services/user.service";
 
 interface User {
@@ -45,18 +44,6 @@ export default function UserTable() {
     }
   };
 
-  const handleEdit = (id: string) => {
-    console.log("Edit user:", id);
-  };
-
-  const handleDelete = async (id: string) => {
-    console.log("Delete user:", id);
-
-    // Example:
-    // const response = await deleteUser(id);
-    // if (response.success) fetchUsers();
-  };
-
   if (loading) {
     return <p>Loading users...</p>;
   }
@@ -70,7 +57,6 @@ export default function UserTable() {
           <TableHead>Employee ID</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Group</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -82,30 +68,12 @@ export default function UserTable() {
             <TableCell>{user.ID}</TableCell>
             <TableCell className="capitalize">{user.role}</TableCell>
             <TableCell>{user.group || "-"}</TableCell>
-
-            <TableCell className="space-x-2 text-right">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleEdit(user._id)}
-              >
-                Edit
-              </Button>
-
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => handleDelete(user._id)}
-              >
-                Delete
-              </Button>
-            </TableCell>
           </TableRow>
         ))}
 
         {users.length === 0 && (
           <TableRow>
-            <TableCell colSpan={6} className="text-center">
+            <TableCell colSpan={5} className="text-center">
               No users found.
             </TableCell>
           </TableRow>
