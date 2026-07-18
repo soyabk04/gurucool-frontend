@@ -25,10 +25,10 @@ interface Login2Props {
 const Login2 = ({
   heading = "Login",
   logo = {
-    url: "https://www.shadcnblocks.com",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-wordmark.svg",
+    url: "/",
+    src: "https://i.ibb.co/Dhx9YXm/TWE-logo.png",
     alt: "logo",
-    title: "shadcnblocks.com",
+    title: "The Wisdom Essentials",
   },
   buttonText = "Login",
   className,
@@ -70,7 +70,7 @@ const Login2 = ({
               src={logo.src}
               alt={logo.alt}
               title={logo.title}
-              className="h-10 dark:invert"
+              className="h-25 dark:invert"
             />
           </a>
 

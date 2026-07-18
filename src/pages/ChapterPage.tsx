@@ -2,31 +2,48 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import VideoPlayer from "@/components/chapter/VideoPlayer";
+import ChapterSidebar from "@/components/chapter/ChapterSidebar";
 import { getChapter } from "@/services/chapter.service";
+import { getChapters } from "@/services/chapter.services";
 
-
+interface Chapter {
+  _id: string;
+  title: string;
+  description?: string;
+  videoUrl: string;
+  duration?: number;
+  order: number;
+  completed?: boolean;
+}
 
 export default function ChapterPage() {
-  const { chapterId } = useParams();
+  const { chapterId, courseId } = useParams();
 
   const [chapter, setChapter] = useState<any>(null);
+  const [chapters, setChapters] = useState<any>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchChapter = async () => {
+    const fetchData = async () => {
       try {
-        if (!chapterId) return;
+        if (!chapterId || !courseId) return;
 
-        const data = await getChapter(chapterId);
-        
-        setChapter(data);
+        const [chapterData, chaptersData] = await Promise.all([
+          getChapter(chapterId),
+          getChapters(courseId),
+        ]);
+
+        setChapter(chapterData);
+        setChapters(chaptersData);
+      } catch (error) {
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchChapter();
-  }, [chapterId]);
+    fetchData();
+  }, [chapterId, courseId]);
 
   if (loading) {
     return (
@@ -45,12 +62,30 @@ export default function ChapterPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">
-        {chapter.title}
-      </h1>
+    <main className="mx-auto max-w-7xl p-6">
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        {/* Main Content */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold">{chapter.title}</h1>
 
-      <VideoPlayer videoUrl={chapter.videoUrl} />
+            {chapter.description && (
+              <p className="mt-2 text-muted-foreground">
+                {chapter.description}
+              </p>
+            )}
+          </div>
+
+          <VideoPlayer videoUrl={chapter.videoUrl} />
+        </div>
+
+        {/* Sidebar */}
+        <ChapterSidebar
+          courseId={courseId!}
+          chapters={chapters}
+          currentChapterId={chapterId!}
+        />
+      </div>
     </main>
   );
 }

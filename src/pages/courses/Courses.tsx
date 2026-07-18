@@ -30,6 +30,7 @@ export default function Courses() {
       try {
         if (canManageCourses) {
           const res = await getCourses();
+          console.log(res)
           setCourses(res.res ?? []);
         } else {
           const res = await getMyCourses();
@@ -55,48 +56,43 @@ export default function Courses() {
   }, [user, canManageCourses]);
 
   return (
-    <div className="container mx-auto space-y-6 py-2">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Courses</h1>
-          <p className="text-muted-foreground">
-            {canManageCourses
-              ? "Manage the courses on your platform."
-              : "Courses you have access to."}
-          </p>
-        </div>
-
-        {canManageCourses && (
-          <Button render={<Link to="/courses/new" />}>Create Course</Button>
-        )}
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{courses.length} course{courses.length === 1 ? "" : "s"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <p className="text-muted-foreground">Loading courses...</p>
-          ) : error ? (
-            <p className="text-destructive">{error}</p>
-          ) : courses.length === 0 ? (
-            <p className="text-muted-foreground">No courses yet.</p>
+<div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+  {courses.map((course) => (
+    <Link
+      key={course._id}
+      to={
+        canManageCourses
+          ? `/courses/${course._id}/edit`
+          : `/courses/${course._id}`
+      }
+    >
+      <Card className="overflow-hidden transition-all hover:-translate-y-1 hover:shadow-lg">
+        <div className="aspect-video bg-muted">
+          {course.thumbnail ? (
+            <img
+              src={course.thumbnail}
+              alt={course.title}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {courses.map((course) => (
-                <Link
-                  key={course._id}
-                  to={canManageCourses ? `/courses/${course._id}/edit` : `/courses/${course._id}`}
-                  className="rounded-lg border p-4 transition-colors hover:bg-accent"
-                >
-                  <h3 className="font-medium">{course.title}</h3>
-                </Link>
-              ))}
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              No Thumbnail
             </div>
           )}
+        </div>
+
+        <CardContent className="space-y-3 p-4">
+          <h3 className="line-clamp-2 text-lg font-semibold">
+            {course.title}
+          </h3>
+
+          <Button className="w-full">
+            {canManageCourses ? "Manage Course" : "Open Course"}
+          </Button>
         </CardContent>
       </Card>
-    </div>
+    </Link>
+  ))}
+</div>
   );
 }

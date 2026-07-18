@@ -33,6 +33,7 @@ if (form.thumbnail) {
 // Full course list — superadmin/admin only (matches GET /courses/cour on the backend).
 export const getCourses = async () => {
   const res = await api.get("/courses/cour");
+  console.log(res)
   return res.data;
 };
 export const getOrgCourses = async () => {

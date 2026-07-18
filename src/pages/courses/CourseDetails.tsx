@@ -50,7 +50,7 @@ export default function CourseDetails() {
               key={chapter._id}
               className="cursor-pointer transition-colors hover:bg-muted/50"
               onClick={() =>
-                navigate(`/courses/chapter/${chapter._id}`)
+                navigate(`/courses/${courseId}/chapter/${chapter._id}`)
               }
             >
               <CardContent className="flex items-center gap-3 p-4">

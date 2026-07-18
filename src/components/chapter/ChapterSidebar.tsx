@@ -49,7 +49,7 @@ export default function ChapterSidebar({
               return (
                 <Link
                   key={chapter._id}
-                  to={`/courses/${courseId}/chapters/${chapter._id}`}
+                  to={`/courses/${courseId}/chapter/${chapter._id}`}
                   className={`flex items-start gap-3 rounded-lg p-3 transition-colors ${
                     isCurrent
                       ? "bg-primary text-primary-foreground"

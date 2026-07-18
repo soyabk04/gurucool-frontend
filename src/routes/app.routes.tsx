@@ -121,7 +121,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-  path="/courses/chapter/:chapterId"
+  path="/courses/:courseId/chapter/:chapterId"
   element={<ChapterPage />}
 />
       </Route>
