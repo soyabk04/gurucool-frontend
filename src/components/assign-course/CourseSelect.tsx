@@ -43,7 +43,6 @@ export default function CourseSelect({
       setLoading(false);
     }
   };
-console.log(courses)
   return (
     <div className="space-y-2">
       <Label htmlFor="course">Course</Label>
