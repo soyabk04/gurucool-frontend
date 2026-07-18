@@ -6,15 +6,6 @@ import ChapterSidebar from "@/components/chapter/ChapterSidebar";
 import { getChapter } from "@/services/chapter.service";
 import { getChapters } from "@/services/chapter.services";
 
-interface Chapter {
-  _id: string;
-  title: string;
-  description?: string;
-  videoUrl: string;
-  duration?: number;
-  order: number;
-  completed?: boolean;
-}
 
 export default function ChapterPage() {
   const { chapterId, courseId } = useParams();

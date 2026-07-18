@@ -40,7 +40,7 @@ export default function ChapterSidebar({
       </CardHeader>
 
       <CardContent className="p-0">
-        <ScrollArea className="h-[650px]">
+        <ScrollArea className="h-162.5">
           <div className="space-y-1 p-2">
             {sortedChapters.map((chapter) => {
               const isCurrent =

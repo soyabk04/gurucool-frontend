@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { getCourses, getMyCourses } from "@/services/course.service";
 
@@ -17,7 +17,8 @@ export default function Courses() {
   const [courses, setCourses] = useState<CourseListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+loading
+error
   const canManageCourses = user?.role === "superadmin" || user?.role === "admin" ;
 
   useEffect(() => {
