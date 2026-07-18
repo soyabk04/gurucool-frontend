@@ -4,7 +4,6 @@ import CourseSelect from "@/components/coordinator/CourseSelect";
 import UserTable from "@/components/coordinator/UserTable";
 import { Button } from "@/components/ui/button";
 import { assignCourseToUsers } from "@/services/coordinator";
-import AppLayout from "@/components/AppLayout";
 
 export default function AssignCoursePage() {
   const [selectedCourse, setSelectedCourse] = useState("");

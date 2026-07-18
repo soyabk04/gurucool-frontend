@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import VideoPlayer from "@/components/chapter/videoplayer";
+import VideoPlayer from "@/components/chapter/VideoPlayer";
 import { getChapter } from "@/services/chapter.service";
 
 
