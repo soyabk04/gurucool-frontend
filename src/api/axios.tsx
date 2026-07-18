@@ -1,7 +1,7 @@
 import axios from "axios";
-
+const apiUrl = import.meta.env.apiL;
 export const api = axios.create({
-  baseURL: "https://gurucool-3yfl.onrender.com/api",
+  baseURL: apiUrl,
   withCredentials: true,
 });
 
