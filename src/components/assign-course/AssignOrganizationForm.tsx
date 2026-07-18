@@ -32,7 +32,7 @@ interface Organization {
 
 interface Course {
     _id: string;
-    name: string;
+    title: string;
 }
 
 export default function AssignOrganizationForm() {
@@ -56,6 +56,7 @@ export default function AssignOrganizationForm() {
             ]);
            
             setOrganizations(orgRes.res);
+            console.log(courseRes)
             setCourses(courseRes.res);
         } catch (err) {
             toast.error("Failed to load data");
@@ -138,7 +139,7 @@ export default function AssignOrganizationForm() {
                             {courses.map((course) => (
                                 
                                 <SelectItem key={course._id} value={course._id}>
-                                    {course.name}
+                                    {course.title}
                                 </SelectItem>
                             ))}
                         </SelectContent>
