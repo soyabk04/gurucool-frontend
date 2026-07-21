@@ -2,7 +2,8 @@ import {api} from "@/api/axios";
 import type { Course, CreateCourse } from "@/types/course";
 
 export const createCourse = async (
-  form: CreateCourse
+  form: CreateCourse,
+  onProgress?: (progress: number) => void
 ): Promise<Course> => {
 const formData = new FormData();
 
@@ -18,15 +19,19 @@ if (form.thumbnail) {
   formData.append("thumbnail", form.thumbnail);
 }
 
-  const response = await api.post(
-    "/courses",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+const response = await api.post("/courses", formData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+  onUploadProgress: (event) => {
+    if (event.total && onProgress) {
+      const percent = Math.round(
+        (event.loaded * 100) / event.total
+      );
+      onProgress(percent);
     }
-  );
+  },
+});
 
   return response.data.course.course;
 };
