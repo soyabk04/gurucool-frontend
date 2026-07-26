@@ -44,7 +44,7 @@ const Login2 = ({
     url: theme.domain,
     src: theme.logoUrl,
     alt: "logo",
-    title: "theme.name",
+    title: theme.name,
   }
 
 
