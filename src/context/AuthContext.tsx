@@ -33,7 +33,7 @@ const setTheme = useCallback(async () => {
 
   try {
     const domain = window.location.hostname;
-    myTheme = await getOrgTheme('gurucool-frontend.vercel.app');
+    myTheme = await getOrgTheme(domain);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log(error.response?.status);
