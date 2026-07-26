@@ -36,16 +36,17 @@ const setTheme = useCallback(async () => {
     myTheme = await getOrgTheme(domain);
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      console.log(error)
       console.log(error.response?.status);
       console.log(error.response?.data?.message);
     }
 
-    myTheme = {
+    myTheme = {data:{
           name: "GuruCool",
           logoUrl: "/logo.png",
           primaryColor: "#063B00",
           secondaryColor: "#64748b",
-        };
+        }}
   }
 
   settheme(myTheme.data);

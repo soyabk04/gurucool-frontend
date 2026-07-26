@@ -38,7 +38,15 @@ const Login2 = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser ,theme} = useAuth();
+  logo
+      const logo1 = {
+    url: theme.domain,
+    src: theme.logoUrl,
+    alt: "logo",
+    title: "theme.name",
+  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +66,7 @@ const Login2 = ({
     } finally {
       setLoading(false);
     }
+
   };
 
   return (
@@ -65,11 +74,11 @@ const Login2 = ({
       <div className="flex h-full items-center justify-center">
         <div className="flex flex-col items-center gap-6">
           {/* Logo */}
-          <a href={logo.url}>
+          <a href={logo1.url}>
             <img
-              src={logo.src}
-              alt={logo.alt}
-              title={logo.title}
+              src={logo1.src}
+              alt={logo1.alt}
+              title={logo1.title}
               className="h-25 dark:invert"
             />
           </a>
