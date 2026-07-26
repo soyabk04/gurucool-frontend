@@ -49,6 +49,7 @@ const setTheme = useCallback(async () => {
   }
 
   settheme(myTheme);
+  console.log(myTheme)
 
   document.title = myTheme.name;
 
