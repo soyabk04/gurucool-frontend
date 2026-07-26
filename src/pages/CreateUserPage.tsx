@@ -30,19 +30,27 @@ export default function CreateUserPage() {
   const [failedUsers, setFailedUsers] = useState<FailedUser[]>([]);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Normalize user input
+   */
   const normalizeUser = (user: PendingUser): PendingUser => ({
     ...user,
-    name: user.name.trim(),
-    email: user.email.trim().toLowerCase(),
-    ID: user.ID.trim(),
-    groupCode: user.groupCode.trim().toUpperCase(),
+    name: user.name?.trim() || "",
+    email: user.email?.trim().toLowerCase() || "",
+    ID: user.ID?.trim() || "",
+    groupCode: user.groupCode?.trim().toUpperCase() || "",
   });
 
   /**
-   * Add one user manually
+   * Add single user
    */
   const addUser = useCallback((user: PendingUser) => {
     const normalized = normalizeUser(user);
+
+    if (!normalized.email || !normalized.ID) {
+      alert("Invalid user data");
+      return;
+    }
 
     setPendingUsers((prev) => {
       const exists = prev.some(
@@ -64,25 +72,25 @@ export default function CreateUserPage() {
    * Add users from CSV
    */
   const addCsvUsers = useCallback((users: PendingUser[]) => {
-    setPendingUsers((prev) => {
-      const emailSet = new Set(
-        prev.map((u) => u.email)
-      );
+    if (!users || users.length === 0) {
+      console.warn("No users received from CSV");
+      return;
+    }
 
-      const idSet = new Set(
-        prev.map((u) => u.ID)
-      );
+    setPendingUsers((prev) => {
+      const emailSet = new Set(prev.map((u) => u.email));
+      const idSet = new Set(prev.map((u) => u.ID));
 
       const usersToAdd: PendingUser[] = [];
 
       for (const rawUser of users) {
         if (
-          !rawUser ||
-          !rawUser.email ||
-          !rawUser.ID ||
-          !rawUser.name ||
-          !rawUser.groupCode
+          !rawUser?.email ||
+          !rawUser?.ID ||
+          !rawUser?.name ||
+          !rawUser?.groupCode
         ) {
+          console.warn("Skipping invalid row:", rawUser);
           continue;
         }
 
@@ -92,9 +100,7 @@ export default function CreateUserPage() {
           emailSet.has(user.email) ||
           idSet.has(user.ID)
         ) {
-          console.warn(
-            `Duplicate skipped: ${user.email}`
-          );
+          console.warn(`Duplicate skipped: ${user.email}`);
           continue;
         }
 
@@ -104,12 +110,16 @@ export default function CreateUserPage() {
         usersToAdd.push(user);
       }
 
+      if (usersToAdd.length === 0) {
+        console.warn("No valid users added from CSV");
+      }
+
       return [...prev, ...usersToAdd];
     });
   }, []);
 
   /**
-   * Remove pending user
+   * Remove user
    */
   const removeUser = useCallback((index: number) => {
     setPendingUsers((prev) =>
@@ -118,7 +128,7 @@ export default function CreateUserPage() {
   }, []);
 
   /**
-   * Create users
+   * Create users API call
    */
   const handleCreateUsers = async () => {
     if (pendingUsers.length === 0) return;
@@ -129,27 +139,21 @@ export default function CreateUserPage() {
 
       const response = await createUsers(pendingUsers);
 
-      if (!response.success) {
+      if (!response?.success) {
+        console.error("API failed:", response);
         return;
       }
 
-      // Adjust this if your backend returns a different shape
-      const created = response.user.createdUsers;
-      const failed = response.user.failedUsers;
+      const created = response?.user?.createdUsers || [];
+      const failed = response?.user?.failedUsers || [];
 
-      setCreatedUsers((prev) => [
-        ...prev,
-        ...created,
-      ]);
-
+      setCreatedUsers((prev) => [...prev, ...created]);
       setFailedUsers(failed);
 
-      // Only failed users stay in the pending list
-      setPendingUsers(
-        failed.map((item: FailedUser) => item.user)
-      );
+      // Keep only failed users in pending
+      setPendingUsers(failed.map((f: FailedUser) => f.user));
     } catch (error) {
-      console.error("Failed to create users:", error);
+      console.error("Create users error:", error);
     } finally {
       setLoading(false);
     }
@@ -157,36 +161,35 @@ export default function CreateUserPage() {
 
   return (
     <div className="container mx-auto space-y-6 p-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">
-          Create Users
-        </h1>
-
+        <h1 className="text-3xl font-bold">Create Users</h1>
         <p className="text-muted-foreground">
           Add users manually or upload a CSV file.
         </p>
       </div>
 
+      {/* Manual Entry */}
       <Card>
         <CardHeader>
           <CardTitle>Add User</CardTitle>
         </CardHeader>
-
         <CardContent>
           <UserEntryForm onAdd={addUser} />
         </CardContent>
       </Card>
 
+      {/* CSV Upload */}
       <Card>
         <CardHeader>
           <CardTitle>Upload CSV</CardTitle>
         </CardHeader>
-
         <CardContent>
           <CsvUpload onUpload={addCsvUsers} />
         </CardContent>
       </Card>
 
+      {/* Pending Users */}
       <Card>
         <CardHeader>
           <CardTitle>
@@ -202,10 +205,7 @@ export default function CreateUserPage() {
 
           <div className="flex justify-end">
             <Button
-              disabled={
-                loading ||
-                pendingUsers.length === 0
-              }
+              disabled={loading || pendingUsers.length === 0}
               onClick={handleCreateUsers}
             >
               {loading
@@ -218,6 +218,7 @@ export default function CreateUserPage() {
         </CardContent>
       </Card>
 
+      {/* Created Users */}
       {createdUsers.length > 0 && (
         <Card>
           <CardHeader>
@@ -225,13 +226,13 @@ export default function CreateUserPage() {
               Successfully Created ({createdUsers.length})
             </CardTitle>
           </CardHeader>
-
           <CardContent>
             <CreatedUsersTable users={createdUsers} />
           </CardContent>
         </Card>
       )}
 
+      {/* Failed Users */}
       {failedUsers.length > 0 && (
         <Card>
           <CardHeader>
@@ -239,7 +240,6 @@ export default function CreateUserPage() {
               Failed Users ({failedUsers.length})
             </CardTitle>
           </CardHeader>
-
           <CardContent>
             <FailedUsersTable users={failedUsers} />
           </CardContent>

@@ -41,9 +41,12 @@ export default function CsvUpload({ onUpload }: Props) {
       const response = await uploadUserCsv(formData);
 
       if (response.success) {
-
-        onUpload(response.data);
-
+  const users: PendingUser[] = response.data.map((user: any) => ({
+    ...user,
+    ID: user.ID ?? user.id,
+  }));
+        onUpload(users);
+        // console.log(response.data)
         // Clear selected file
         setFile(null);
 

@@ -31,9 +31,7 @@ export const logout = async () => {
   return response.data;
 };
 
-// Backend has no dedicated `/auth/me` route — `/auth/isloggedin` already
-// verifies the session cookie via authMiddleware *and* returns the decoded
-// {userId, role} payload, so it doubles as the "who am I" endpoint.
+
 export const me = async (): Promise<{ success: boolean; user: AuthUser }> => {
   const response = await api.get("/auth/isloggedin");
   return response.data;

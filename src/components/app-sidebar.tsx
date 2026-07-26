@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-
 import {
   Sidebar,
   SidebarContent,
@@ -90,7 +89,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, logout } = useAuth();
+  const { user, logout ,theme} = useAuth();
   const location = useLocation();
 
   const visibleItems = user
@@ -112,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <GalleryVerticalEndIcon className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-medium">GuruCool</span>
+                <span className="font-medium">{theme.name}</span>
                 {user && (
                   <span className="text-xs capitalize text-muted-foreground">
                     {user.role}

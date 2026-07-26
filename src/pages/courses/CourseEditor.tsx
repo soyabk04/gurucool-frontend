@@ -53,12 +53,13 @@ export default function CourseEditor() {
         courseId,
         data,
         (percent) => {
+           setUploading(true);
           setProgress(percent);
         }
       );
 
-      setProgress(100);
-
+ setUploading(false);
+ window.location.reload();
       // Let the user briefly see "Finalizing..."
       await new Promise((resolve) => setTimeout(resolve, 700));
 

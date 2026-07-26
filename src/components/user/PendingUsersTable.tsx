@@ -21,6 +21,7 @@ export default function PendingUsersTable({
   users,
   onRemove,
 }: Props) {
+  // console.log(users)
   if (users.length === 0) {
     return (
       <div className="rounded-md border py-8 text-center text-muted-foreground">

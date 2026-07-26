@@ -6,25 +6,68 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import axios from "axios";
 import { me, logout as logoutRequest, type AuthUser } from "@/services/auth.service";
+import { getOrgTheme } from "@/services/theme.service";
 
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
+  theme: any | null;
   // Re-checks the session with the backend. Returns the user (or null).
   refresh: () => Promise<AuthUser | null>;
   // Optimistically set the user right after a successful login, without
   // waiting on a second round-trip to the server.
   setUser: (user: AuthUser | null) => void;
   logout: () => Promise<void>;
+  setTheme: any;
 }
-
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [theme,settheme]=useState<any |null>(null)
+const setTheme = useCallback(async () => {
+  let myTheme;
 
+  try {
+    const domain = window.location.hostname;
+    myTheme = await getOrgTheme(domain);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.response?.status);
+      console.log(error.response?.data?.message);
+    }
+
+    myTheme = {
+          name: "GuruCool",
+          logoUrl: "/logo.png",
+          primaryColor: "#063B00",
+          secondaryColor: "#64748b",
+        };
+  }
+
+  settheme(myTheme);
+
+  document.title = myTheme.name;
+
+  const siteIcon = document.getElementById("siteIcon");
+  siteIcon?.setAttribute("href", myTheme.logoUrl);
+
+  document.documentElement.style.setProperty(
+    "--primary",
+    myTheme.primaryColor
+  );
+
+  document.documentElement.style.setProperty(
+    "--secondary",
+    myTheme.secondaryColor
+  );
+}, []);
+  useEffect(() => {
+    setTheme();
+  }, [setTheme]);
   const refresh = useCallback(async () => {
     try {
       const res = await me();
@@ -55,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, refresh, setUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, refresh, setUser,setTheme,theme, logout }}>
       {children}
     </AuthContext.Provider>
   );
