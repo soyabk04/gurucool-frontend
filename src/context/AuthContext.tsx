@@ -33,7 +33,7 @@ const setTheme = useCallback(async () => {
 
   try {
     const domain = window.location.hostname;
-    myTheme = await getOrgTheme(domain);
+    myTheme = await getOrgTheme('gurucool-frontend.vercel.app');
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log(error.response?.status);
@@ -48,22 +48,22 @@ const setTheme = useCallback(async () => {
         };
   }
 
-  settheme(myTheme);
-  console.log(myTheme)
+  settheme(myTheme.data);
+  console.log(myTheme.data)
 
-  document.title = myTheme.name;
+  document.title = myTheme.data.name;
 
   const siteIcon = document.getElementById("siteIcon");
-  siteIcon?.setAttribute("href", myTheme.logoUrl);
+  siteIcon?.setAttribute("href", myTheme.data.logoUrl);
 
   document.documentElement.style.setProperty(
     "--primary",
-    myTheme.primaryColor
+    myTheme.data.primaryColor
   );
 
   document.documentElement.style.setProperty(
     "--secondary",
-    myTheme.secondaryColor
+    myTheme.data.secondaryColor
   );
 }, []);
   useEffect(() => {
