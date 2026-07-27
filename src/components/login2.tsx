@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { login } from "@/services/auth.service";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 
 interface Login2Props {
   heading?: string;
@@ -38,13 +39,14 @@ const Login2 = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { setUser ,theme} = useAuth();
+  const { setUser } = useAuth();
+  const {theme}=useTheme()
   logo
       const logo1 = {
-    url: theme.domain,
-    src: theme.logoUrl,
+    url: theme?.domain,
+    src: theme?.logoUrl,
     alt: "logo",
-    title: theme.name,
+    title: theme?.name,
   }
 
 

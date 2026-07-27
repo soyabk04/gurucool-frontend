@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/services/auth.service";
+import { useTheme } from "@/context/ThemeContext";
 
 interface NavItem {
   title: string;
@@ -89,9 +90,11 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, logout ,theme} = useAuth();
+  const { user, logout } = useAuth();
+  const {theme}=useTheme()
+  if (!user) return <div>Loading...</div>;
   const location = useLocation();
-
+console.log(theme)
   const visibleItems = user
     ? NAV_ITEMS.filter((item) => item.roles.includes(user.role))
     : [];
@@ -111,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <GalleryVerticalEndIcon className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-medium">{theme.name}</span>
+                <span className="font-medium">{theme?.name}</span>
                 {user && (
                   <span className="text-xs capitalize text-muted-foreground">
                     {user.role}
@@ -126,6 +129,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
+            
             {visibleItems.map((item) => {
               const isActive =
                 location.pathname === item.url ||
