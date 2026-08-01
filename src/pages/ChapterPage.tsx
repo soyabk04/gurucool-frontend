@@ -5,6 +5,8 @@ import VideoPlayer from "@/components/chapter/VideoPlayer";
 import ChapterSidebar from "@/components/chapter/ChapterSidebar";
 import { getChapter } from "@/services/chapter.service";
 import { getChapters } from "@/services/chapter.services";
+import axios from "axios";
+import { toast } from "sonner";
 
 
 export default function ChapterPage() {
@@ -27,7 +29,13 @@ export default function ChapterPage() {
         setChapter(chapterData);
         setChapters(chaptersData);
       } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(error.response?.status);
+        console.error(error.response?.data?.message);
+        toast.error(error.response?.data?.message)
+      } else {
         console.error(error);
+      }
       } finally {
         setLoading(false);
       }

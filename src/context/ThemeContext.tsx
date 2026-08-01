@@ -8,6 +8,7 @@ import {
 } from "react";
 import axios from "axios";
 import { getOrgTheme } from "@/services/theme.service";
+import { toast } from "sonner";
 
 interface Theme {
   name: string;
@@ -76,8 +77,10 @@ export function ThemeProvider({
       
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error(error.response?.status);
+        
+
         console.error(error.response?.data?.message);
+        toast.error(error.response?.data?.message)
       } else {
         console.error(error);
       }

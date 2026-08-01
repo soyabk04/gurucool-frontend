@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { login } from "@/services/auth.service";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import { toast } from "sonner";
 
 interface Login2Props {
   heading?: string;
@@ -64,7 +65,8 @@ const Login2 = ({
 
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(err.response.data.message|| "Login failed");
+      toast.error(err.response.data.message)
     } finally {
       setLoading(false);
     }

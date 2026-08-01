@@ -18,6 +18,7 @@ import CreatedUsersTable from "@/components/user/CreatedUsersTable";
 import FailedUsersTable from "@/components/user/FailedUsersTable";
 
 import { createUsers } from "@/services/user.service";
+import { toast } from "sonner";
 
 export interface FailedUser {
   user: PendingUser;
@@ -48,7 +49,7 @@ export default function CreateUserPage() {
     const normalized = normalizeUser(user);
 
     if (!normalized.email || !normalized.ID) {
-      alert("Invalid user data");
+      toast.warning("Invalid user data");
       return;
     }
 
@@ -60,7 +61,7 @@ export default function CreateUserPage() {
       );
 
       if (exists) {
-        alert("User already exists in pending list.");
+        toast.warning("User already exists in pending list.");
         return prev;
       }
 
@@ -73,7 +74,7 @@ export default function CreateUserPage() {
    */
   const addCsvUsers = useCallback((users: PendingUser[]) => {
     if (!users || users.length === 0) {
-      console.warn("No users received from CSV");
+      toast.warning("No users received from CSV");
       return;
     }
 
@@ -90,7 +91,7 @@ export default function CreateUserPage() {
           !rawUser?.name ||
           !rawUser?.groupCode
         ) {
-          console.warn("Skipping invalid row:", rawUser);
+          toast.warning(`Skipping invalid row: ${rawUser}`);
           continue;
         }
 
@@ -100,7 +101,7 @@ export default function CreateUserPage() {
           emailSet.has(user.email) ||
           idSet.has(user.ID)
         ) {
-          console.warn(`Duplicate skipped: ${user.email}`);
+          toast.warning(`Duplicate skipped: ${user.email}`);
           continue;
         }
 
@@ -111,7 +112,7 @@ export default function CreateUserPage() {
       }
 
       if (usersToAdd.length === 0) {
-        console.warn("No valid users added from CSV");
+        toast.warning("No valid users added from CSV");
       }
 
       return [...prev, ...usersToAdd];
@@ -141,6 +142,7 @@ export default function CreateUserPage() {
 
       if (!response?.success) {
         console.error("API failed:", response);
+        toast.error(response?.data?.message)
         return;
       }
 
@@ -152,8 +154,8 @@ export default function CreateUserPage() {
 
       // Keep only failed users in pending
       setPendingUsers(failed.map((f: FailedUser) => f.user));
-    } catch (error) {
-      console.error("Create users error:", error);
+    } catch (error:any) {
+      toast.error(error.response?.data?.message);
     } finally {
       setLoading(false);
     }

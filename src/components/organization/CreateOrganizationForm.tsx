@@ -12,6 +12,8 @@ import {
 import { createOrg } from "@/services/organization.service";
 
 export default function CreateOrganization() {
+
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [form, setForm] = useState({
     name: "",
     domain: "",
@@ -44,12 +46,10 @@ export default function CreateOrganization() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      setUploadProgress(0);
 
-      const formData = new FormData();
-
-      formData.append(
-        "organization",
-        JSON.stringify({
+      const response = await createOrg(
+        {
           name: form.name,
           domain: form.domain,
           primaryColor: form.primaryColor,
@@ -62,18 +62,16 @@ export default function CreateOrganization() {
               role: "admin",
             },
           ],
-        })
+        },
+        logo ?? undefined,
+        (progress) => {
+          setUploadProgress(progress);
+        }
       );
 
-      if (logo) {
-        formData.append("logo", logo);
-      }
-
-      const response = await createOrg(formData);
-
       if (response.success) {
+        setUploadProgress(100);
 
-        // Optional: Reset form
         setForm({
           name: "",
           domain: "",
@@ -86,127 +84,132 @@ export default function CreateOrganization() {
         });
 
         setLogo(null);
-      } else {
-        console.error(response);
       }
     } catch (error) {
       console.error("Failed to create organization:", error);
     } finally {
       setLoading(false);
+
+      // Optional: hide the progress after a short delay
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 500);
     }
   };
-    return (
+  return (
     <Card className="max-w-3xl mx-auto">
       <CardHeader>
         <CardTitle>Create Organization</CardTitle>
       </CardHeader>
 
-            <CardContent className="space-y-8">
-                <div>
-                    <h3 className="mb-4 text-lg font-semibold">
-                        Organization Details
-                    </h3>
+      <CardContent className="space-y-8">
+        <div>
+          <h3 className="mb-4 text-lg font-semibold">
+            Organization Details
+          </h3>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <Label>Name</Label>
-                            <Input
-                                name="name"
-                                value={form.name}
-                                onChange={handleChange}
-                            />
-                        </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Label>Name</Label>
+              <Input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+              />
+            </div>
 
-                        <div>
-                            <Label>Domain</Label>
-                            <Input
-                                name="domain"
-                                value={form.domain}
-                                onChange={handleChange}
-                            />
-                        </div>
+            <div>
+              <Label>Domain</Label>
+              <Input
+                name="domain"
+                value={form.domain}
+                onChange={handleChange}
+              />
+            </div>
 
-                        <div>
-                            <Label htmlFor="logo">Organization Logo</Label>
-                            {logo && (
-                                <img
-                                    src={URL.createObjectURL(logo)}
-                                    alt="Logo Preview"
-                                    className="mt-2 h-24 w-24 rounded-md border object-cover"
-                                />
-                            )}
-                            <Input
-                                id="logo"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleLogoChange}
+            <div>
+              <Label htmlFor="logo">Organization Logo</Label>
+              {logo && (
+                <img
+                  src={URL.createObjectURL(logo)}
+                  alt="Logo Preview"
+                  className="mt-2 h-24 w-24 rounded-md border object-cover"
+                />
+              )}
+              <Input
+                id="logo"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
 
-                            />
-                        </div>
+              />
+            </div>
 
-                        <div>
-                            <Label>Primary Color</Label>
-                            <Input
-                                type="color"
-                                name="primaryColor"
-                                value={form.primaryColor}
-                                onChange={handleChange}
-                            />
-                        </div>
+            <div>
+              <Label>Primary Color</Label>
+              <Input
+                type="color"
+                name="primaryColor"
+                value={form.primaryColor}
+                onChange={handleChange}
+              />
+            </div>
 
-                        <div>
-                            <Label>Secondary Color</Label>
-                            <Input
-                                type="color"
-                                name="secondaryColor"
-                                value={form.secondaryColor}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-                </div>
+            <div>
+              <Label>Secondary Color</Label>
+              <Input
+                type="color"
+                name="secondaryColor"
+                value={form.secondaryColor}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+        </div>
 
-                <div>
-                    <h3 className="mb-4 text-lg font-semibold">
-                        Organization Admin
-                    </h3>
+        <div>
+          <h3 className="mb-4 text-lg font-semibold">
+            Organization Admin
+          </h3>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <Label>First Name</Label>
-                            <Input
-                                name="firstName"
-                                value={form.firstName}
-                                onChange={handleChange}
-                            />
-                        </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Label>First Name</Label>
+              <Input
+                name="firstName"
+                value={form.firstName}
+                onChange={handleChange}
+              />
+            </div>
 
-                        <div>
-                            <Label>Id</Label>
-                            <Input
-                                name="id"
-                                value={form.id}
-                                onChange={handleChange}
-                            />
-                        </div>
+            <div>
+              <Label>Id</Label>
+              <Input
+                name="id"
+                value={form.id}
+                onChange={handleChange}
+              />
+            </div>
 
-                        <div>
-                            <Label>Email</Label>
-                            <Input
-                                type="email"
-                                name="email"
-                                value={form.email}
-                                onChange={handleChange}
-                            />
-                        </div>
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+              />
+            </div>
 
-                    </div>
-                </div>
+          </div>
+        </div>
 
-                <Button onClick={handleSubmit} className="w-full">
-                    Create Organization
-                </Button>
-            </CardContent>
-        </Card>
-    );
+        <Button onClick={handleSubmit} className="w-full">
+          {loading
+            ? `Uploading ${uploadProgress}%`
+            : "Create Organization"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
 }

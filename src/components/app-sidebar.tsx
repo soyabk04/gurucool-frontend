@@ -94,7 +94,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {theme}=useTheme()
   if (!user) return <div>Loading...</div>;
   const location = useLocation();
-console.log(theme)
   const visibleItems = user
     ? NAV_ITEMS.filter((item) => item.roles.includes(user.role))
     : [];

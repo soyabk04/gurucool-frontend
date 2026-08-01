@@ -17,7 +17,16 @@ export interface OrganizationUser {
   password: string;
 }
 
-export interface CreateOrganizationRequest {
-  organization: Organization;
-  user: OrganizationUser;
+export interface CreateOraganization {
+  name: string;
+  domain: string;
+  primaryColor: string;
+  secondaryColor: string;
+  users: {
+    name: string;
+    ID: string;
+    email: string;
+    role: "admin";
+  }[];
 }
+

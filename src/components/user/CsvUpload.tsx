@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 
 import type { PendingUser } from "./UserEntryForm";
 import { uploadUserCsv } from "@/services/user.service";
+import { toast } from "sonner";
 
 interface Props {
   onUpload: (users: PendingUser[]) => void;
@@ -54,8 +55,8 @@ export default function CsvUpload({ onUpload }: Props) {
           inputRef.current.value = "";
         }
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err:any) {
+      toast.error(err);
     } finally {
       setLoading(false);
     }
