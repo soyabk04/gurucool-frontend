@@ -137,9 +137,10 @@ export default function CreateUserPage() {
     try {
       setLoading(true);
       setFailedUsers([]);
+      console.log(pendingUsers)
 
       const response = await createUsers(pendingUsers);
-
+      console.log(pendingUsers)
       if (!response?.success) {
         console.error("API failed:", response);
         toast.error(response?.data?.message)

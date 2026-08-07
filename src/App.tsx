@@ -1,14 +1,17 @@
 import AppRoutes from "./routes/app.routes";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import {AppearanceProvider} from "./context/AppearanceContext";
+import "@fontsource/inter";
 
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider>
-        <AppRoutes />
-      </ThemeProvider>
-      
+      <AppearanceProvider>
+        <ThemeProvider>
+          <AppRoutes />
+        </ThemeProvider>
+      </AppearanceProvider>
     </AuthProvider>
   );
 }

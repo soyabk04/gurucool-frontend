@@ -1,21 +1,31 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
-type Props = {
+interface LoggedInRouteProps {
   children: React.ReactNode;
-};
+}
 
-// Used on routes like /login that a logged-in user shouldn't see again.
-export function LoggedInRoute({ children }: Props) {
+/**
+ * Public-only route.
+ * - Logged-out users can access the page.
+ * - Logged-in users are redirected to the dashboard.
+ */
+export default function LoggedInRoute({
+  children,
+}: LoggedInRouteProps) {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-muted-foreground">
-        Loading...
+      <div className="flex h-screen items-center justify-center">
+        <span className="text-muted-foreground">Loading...</span>
       </div>
     );
   }
 
-  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 }

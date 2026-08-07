@@ -55,8 +55,7 @@ export default function AssignOrganizationForm() {
                 getCourses(),
             ]);
            
-            setOrganizations(orgRes.res);
-            console.log(courseRes)
+            setOrganizations(orgRes.res.data);
             setCourses(courseRes.res);
         } catch (err) {
             toast.error("Failed to load data");
@@ -87,7 +86,6 @@ export default function AssignOrganizationForm() {
             setLoading(false);
         }
     };
-
 
     return (
         <Card>

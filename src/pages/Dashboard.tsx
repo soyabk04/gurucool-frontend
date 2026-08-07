@@ -11,6 +11,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/services/auth.service";
+import AdminDashboardPage from "./adminDashboard";
 
 interface QuickAction {
   title: string;
@@ -85,7 +86,11 @@ const Dashboard = () => {
   const actions = user
     ? QUICK_ACTIONS.filter((action) => action.roles.includes(user.role))
     : [];
-
+if(user?.role=="admin"){
+  return(
+  <AdminDashboardPage />
+);
+}
   return (
     <div className="space-y-8">
       <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 ring-1 ring-primary/10 sm:p-8">

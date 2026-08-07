@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import {
   Table,
@@ -27,9 +28,9 @@ export default function OrganizationTable() {
     const fetchOrganizations = async () => {
       try {
         const response = await getOrg();
-
         if (response.success) {
-          setOrganizations(response.res);
+          setOrganizations(response.res.data);
+          console.log(response.res.data);
         }
       } catch (error) {
         console.error("Failed to fetch organizations:", error);
@@ -59,13 +60,20 @@ export default function OrganizationTable() {
       <TableBody>
         {organizations.map((org) => (
           <TableRow key={org._id}>
-            <TableCell>{org.name}</TableCell>
+            <TableCell>
+              <Link
+                to={`/organization/${org._id}`}
+                className="font-medium hover:underline"
+              >
+                {org.name}
+              </Link>
+            </TableCell>
             <TableCell>{org.domain}</TableCell>
             <TableCell>{org.totalUsers}</TableCell>
 
             <TableCell className="text-right space-x-2">
-              <Button size="sm" variant="outline">
-                Edit
+              <Button size="sm" variant="outline" render={<Link to={`/organization/${org._id}`} />}>
+                View
               </Button>
 
               <Button size="sm" variant="destructive">

@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { createOrg } from "@/services/organization.service";
+import { toast } from "sonner";
 
 export default function CreateOrganization() {
 
@@ -68,8 +69,9 @@ export default function CreateOrganization() {
           setUploadProgress(progress);
         }
       );
-
+      console.log("Organization created:", response);
       if (response.success) {
+        toast.success(response.message || "Organization created successfully");
         setUploadProgress(100);
 
         setForm({
@@ -84,9 +86,14 @@ export default function CreateOrganization() {
         });
 
         setLogo(null);
+        // window.location.reload();
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Failed to create organization:", error);
+          toast.error(
+      error?.response?.data?.message ||
+        "Failed to create organization"
+    );
     } finally {
       setLoading(false);
 

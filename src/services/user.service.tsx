@@ -1,13 +1,18 @@
 import { api } from "@/api/axios";
 
-export const getUsers = async () => {
-  const response = await api.get("/auth/getusers");
-//   console.log(response)
-  return response.data;
+export const getUsers = async (organizationId?: string) => {
+  if (!organizationId) {
+    const response = await api.get("/auth/getusers");
+    return response.data;
+  } else {
+    const response = await api.get(`/auth/getusers/?organizationId=${organizationId}`);
+    return response.data;
+  }
+
 };
 
-export const createUsers = async (data:any) => {
-  const response = await api.post("/auth/createuser",data);
+export const createUsers = async (data:any[]) => {
+  const response = await api.post("/auth/createuser",{users:data});
   return response.data;
 };
 
@@ -24,3 +29,7 @@ export const uploadUserCsv = async (formData: FormData) => {
     return res.data;
 };
 
+export const forgotPassword = async (data: { email: string }) => {
+  const response = await api.post("/auth/send-reset-password-email", data);
+  return response.data;
+};

@@ -46,7 +46,12 @@ api.interceptors.response.use(
 
       // The refresh token is gone/expired too — the session is truly over.
       // Send the user back to login rather than letting requests fail silently.
-      if (window.location.pathname !== "/login") {
+      const PUBLIC_ROUTES = [
+  "/login",
+  "/forgot-password",
+  "/user/reset-password",
+];
+      if (!PUBLIC_ROUTES.includes(window.location.pathname)) {
         window.location.href = "/login";
       }
     }

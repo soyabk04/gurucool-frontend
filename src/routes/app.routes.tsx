@@ -1,39 +1,71 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
-import NotFound from "@/pages/NotFound";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { LoggedInRoute } from "@/components/LoggedInRoutes";
 import AppLayout from "@/components/AppLayout";
+import LoggedInRoute from "@/components/LoggedInRoutes";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+import LoginPage from "@/pages/Login";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+// import ResetPasswordPage from "@/pages/ResetPasswordPage";
+
+import Dashboard from "@/pages/Dashboard";
 import OrganizationPage from "@/pages/OrganizationPage";
+import OrganizationDetailsPage from "@/pages/OrganizationDetailsPage";
 import GroupPage from "@/pages/GroupPage";
 import UserPage from "@/pages/UserPage";
 import CreateUserPage from "@/pages/CreateUserPage";
+
 import Courses from "@/pages/courses/Courses";
 import CreateCourse from "@/pages/courses/CreateCourse";
 import CourseDetails from "@/pages/courses/CourseDetails";
 import CourseEditor from "@/pages/courses/CourseEditor";
+
 import AssignOrganizationCourse from "@/pages/superadmin/AssignOrganizationCourse";
 import AssignGroupCourse from "@/pages/admin/AssignOrganizationCourse";
 import AssignCoursePage from "@/pages/coordinator/AssignCoursePage";
-import ChapterPage from "@/pages/ChapterPage"
+import OrganizationSettingsPage from "@/pages/OrganizationSettingsPage";
+import ChapterPage from "@/pages/ChapterPage";
+
+import NotFound from "@/pages/NotFound";
 
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
+      {/* ===================== */}
+      {/* Public Routes */}
+      {/* ===================== */}
       <Route
         path="/login"
         element={
           <LoggedInRoute>
-            <Login />
+            <LoginPage />
           </LoggedInRoute>
         }
       />
 
-      {/* Every route below shares the sidebar/header shell and requires auth. */}
+      <Route
+        path="/forgot-password"
+        element={
+          <LoggedInRoute>
+            <ForgotPasswordPage />
+          </LoggedInRoute>}
+      />
+
+      {/* Uncomment after creating the page */}
+      {/*
+      <Route
+        path="/user/reset-password"
+        element={<ResetPasswordPage />}
+      />
+      */}
+
+      {/* ===================== */}
+      {/* Protected Routes */}
+      {/* ===================== */}
+
       <Route
         element={
           <ProtectedRoute>
@@ -41,20 +73,32 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        
         <Route path="/dashboard" element={<Dashboard />} />
-              <Route
-        path="/courses/assign-course"
-        element={
-          <ProtectedRoute roles={["admin",'coordinator']}>
-            <AssignCoursePage />
-          </ProtectedRoute>}
-      />
+        <Route path="/orgsetting" element={<OrganizationSettingsPage />} />
+        <Route
+          path="/courses/assign-course"
+          element={
+            <ProtectedRoute roles={["admin", "coordinator"]}>
+              <AssignCoursePage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/organization"
           element={
             <ProtectedRoute roles={["superadmin"]}>
               <OrganizationPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/organization/:id"
+          element={
+            <ProtectedRoute roles={["superadmin"]}>
+              <OrganizationDetailsPage />
             </ProtectedRoute>
           }
         />
@@ -71,21 +115,27 @@ export default function AppRoutes() {
         <Route
           path="/users"
           element={
-            <ProtectedRoute roles={["superadmin", "admin", "coordinator"]}>
+            <ProtectedRoute
+              roles={["superadmin", "admin", "coordinator"]}
+            >
               <UserPage />
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/users/create"
           element={
-            <ProtectedRoute roles={["superadmin", "admin", "coordinator"]}>
+            <ProtectedRoute
+              roles={["superadmin", "admin", "coordinator"]}
+            >
               <CreateUserPage />
             </ProtectedRoute>
           }
         />
 
         <Route path="/courses" element={<Courses />} />
+
         <Route
           path="/courses/new"
           element={
@@ -94,6 +144,12 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/courses/:courseId"
+          element={<CourseDetails />}
+        />
+
         <Route
           path="/courses/:courseId/edit"
           element={
@@ -102,7 +158,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="/courses/:courseId" element={<CourseDetails />} />
 
         <Route
           path="/courses/assignOrg"
@@ -112,6 +167,7 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/courses/assigngrp"
           element={
@@ -120,12 +176,16 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
         <Route
-  path="/courses/:courseId/chapter/:chapterId"
-  element={<ChapterPage />}
-/>
+          path="/courses/:courseId/chapter/:chapterId"
+          element={<ChapterPage />}
+        />
       </Route>
 
+      {/* ===================== */}
+      {/* 404 */}
+      {/* ===================== */}
 
       <Route path="*" element={<NotFound />} />
     </Routes>

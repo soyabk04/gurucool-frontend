@@ -34,6 +34,7 @@ export const logout = async () => {
 
 export const me = async (): Promise<{ success: boolean; user: AuthUser }> => {
   const response = await api.get("/auth/isloggedin");
+  console.log("me response", response.data);
   return response.data;
 };
 

@@ -1,4 +1,5 @@
 import { Building2, Globe, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,14 @@ export default function OrganizationCard({
       </CardContent>
 
       <CardFooter className="flex justify-end gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          render={<Link to={`/organization/${organization.id}`} />}
+        >
+          View
+        </Button>
+
         <Button
           variant="outline"
           size="sm"

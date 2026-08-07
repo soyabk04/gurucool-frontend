@@ -35,7 +35,7 @@ export default function CourseSelect({
     try {
       const res = await getCourses();
 
-      console.log(res)
+      // console.log(res)
       setCourses(res.data.res ?? res.data);
     } catch (error) {
       console.error("Failed to fetch courses", error);

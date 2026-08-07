@@ -36,10 +36,16 @@ const response = await api.post("/courses", formData, {
   return response.data.course.course;
 };
 // Full course list — superadmin/admin only (matches GET /courses/cour on the backend).
-export const getCourses = async () => {
-  const res = await api.get("/courses/cour");
-  console.log(res)
-  return res.data;
+export const getCourses = async (organizationId?: string) => {
+  if (!organizationId) {
+    const res = await api.get("/courses/cour");
+    console.log(res.data)
+    return res.data;
+  } else {
+    const res = await api.get(`/courses/cour/?organizationId=${organizationId}`);
+    return res.data;
+  }
+
 };
 export const getOrgCourses = async () => {
   const res = await api.get("/courses/orgcourses");

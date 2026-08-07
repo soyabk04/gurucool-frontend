@@ -25,14 +25,6 @@ interface Login2Props {
 }
 
 const Login2 = ({
-  heading = "Login",
-  logo = {
-    url: "/",
-    src: "https://i.ibb.co/Dhx9YXm/TWE-logo.png",
-    alt: "logo",
-    title: "The Wisdom Essentials",
-  },
-  buttonText = "Login",
   className,
 }: Login2Props) => {
   const [email, setEmail] = useState("");
@@ -42,13 +34,8 @@ const Login2 = ({
   const navigate = useNavigate();
   const { setUser } = useAuth();
   const {theme}=useTheme()
-  logo
-      const logo1 = {
-    url: theme?.domain,
-    src: theme?.logoUrl,
-    alt: "logo",
-    title: theme?.name,
-  }
+
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,66 +60,214 @@ const Login2 = ({
 
   };
 
-  return (
-    <section className={cn("h-screen bg-muted", className)}>
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          {/* Logo */}
-          <a href={logo1.url}>
-            <img
-              src={logo1.src}
-              alt={logo1.alt}
-              title={logo1.title}
-              className="h-25 dark:invert"
-            />
-          </a>
+ return (
+<section
+  className={cn(
+    "relative flex min-h-screen items-center justify-center overflow-hidden",
+    className
+  )}
+  style={{
+    background: `
+      radial-gradient(circle at top left, ${theme?.primaryColor}40 0%, transparent 35%),
+      radial-gradient(circle at bottom right, ${theme?.secondaryColor}40 0%, transparent 40%),
+      linear-gradient(135deg, ${theme?.primaryColor}, ${theme?.secondaryColor})
+    `,
+  }}
+>
+  {/* Background Glow */}
+  <div
+    className="absolute -left-32 -top-24 h-96 w-96 rounded-full blur-[140px]"
+    style={{
+      background: theme?.primaryColor,
+      opacity: 0.35,
+    }}
+  />
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full max-w-sm min-w-sm flex-col gap-y-4 rounded-md border bg-background px-6 py-8 shadow-md"
-          >
-            {heading && (
-              <h1 className="text-xl font-semibold text-center">
-                {heading}
-              </h1>
-            )}
+  <div
+    className="absolute -bottom-32 -right-24 h-[28rem] w-[28rem] rounded-full blur-[160px]"
+    style={{
+      background: theme?.secondaryColor,
+      opacity: 0.35,
+    }}
+  />
 
-            {error && (
-              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
-              </p>
-            )}
+  {/* Perspective Grid */}
+  <div className="absolute inset-0 overflow-hidden">
+    <div
+      className="absolute inset-0 opacity-20"
+      style={{
+        backgroundImage: `
+          linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px)
+        `,
+        backgroundSize: "70px 70px",
+        transform: "perspective(1200px) rotateX(72deg)",
+        transformOrigin: "top",
+      }}
+    />
+  </div>
 
-            <div className="flex flex-col gap-2">
-              <Label>Email</Label>
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+  {/* Dark Overlay */}
+  <div className="absolute inset-0 bg-black/10" />
 
-            <div className="flex flex-col gap-2">
-              <Label>Password</Label>
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : buttonText}
-            </Button>
-          </form>
-        </div>
+  {/* Login Card */}
+  <div
+    className="
+      relative
+      z-10
+      w-full
+      max-w-md
+      rounded-[32px]
+      border
+      border-white/20
+      bg-white/15
+      p-10
+      shadow-[0_20px_80px_rgba(0,0,0,.25)]
+      backdrop-blur-3xl
+      animate-in
+      fade-in
+      zoom-in-95
+      duration-500
+    "
+  >
+    {/* Logo */}
+    {theme?.logoUrl && (
+      <div className="mb-6 flex justify-center">
+        <img
+          src={theme.logoUrl}
+          alt={theme.name}
+          className="h-16 w-16 rounded-2xl border border-white/30 bg-white object-cover shadow-lg"
+        />
       </div>
-    </section>
-  );
+    )}
+
+    {/* Badge */}
+    <div className="mb-6 flex justify-center">
+      <span
+        className="rounded-full border border-white/30 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-md"
+        style={{
+          backgroundColor: `${theme?.primaryColor}55`,
+        }}
+      >
+        {theme?.name}
+      </span>
+    </div>
+
+    {/* Heading */}
+    <div className="mb-8 text-center">
+      <h1 className="text-4xl font-bold text-white">
+        Welcome Back
+      </h1>
+
+      <p className="mt-2 text-sm text-white/70">
+        Sign in to continue to your dashboard.
+      </p>
+    </div>
+
+    {/* Error */}
+    {error && (
+      <div className="mb-5 rounded-xl border border-red-400/30 bg-red-500/15 p-3 text-sm text-red-100 backdrop-blur-md">
+        {error}
+      </div>
+    )}
+
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Email */}
+      <div>
+        <Label className="mb-2 block text-sm font-medium text-white/80">
+          Email Address
+        </Label>
+
+        <Input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="john@example.com"
+          className="
+            h-14
+            rounded-2xl
+            border-white/20
+            bg-white/10
+            text-white
+            placeholder:text-white/40
+            backdrop-blur-sm
+            focus-visible:border-white/40
+            focus-visible:ring-2
+            focus-visible:ring-white/30
+          "
+        />
+      </div>
+
+      {/* Password */}
+      <div>
+        <Label className="mb-2 block text-sm font-medium text-white/80">
+          Password
+        </Label>
+
+        <Input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          className="
+            h-14
+            rounded-2xl
+            border-white/20
+            bg-white/10
+            text-white
+            placeholder:text-white/40
+            backdrop-blur-sm
+            focus-visible:border-white/40
+            focus-visible:ring-2
+            focus-visible:ring-white/30
+          "
+        />
+      </div>
+
+      {/* Remember */}
+      <div className="flex items-center justify-between text-sm">
+        <label className="flex items-center gap-2 text-white/80">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-white/30"
+          />
+          Remember me
+        </label>
+
+        <button
+          type="button"
+          className="font-medium text-white/80 transition hover:text-white"
+          onClick={() => (window.location.href = "/forgot-password")}
+        >
+          Forgot password?
+        </button>
+      </div>
+
+      {/* Button */}
+      <Button
+        type="submit"
+        disabled={loading}
+        className="
+          h-14
+          w-full
+          rounded-2xl
+          text-base
+          font-semibold
+          text-white
+          transition-all
+          hover:scale-[1.02]
+          active:scale-[.98]
+        "
+        style={{
+          backgroundColor: theme?.primaryColor,
+        }}
+      >
+        {loading ? "Signing In..." : "Sign In"}
+      </Button>
+    </form>
+  </div>
+</section>
+);
 };
 
 export default Login2;

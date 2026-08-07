@@ -50,13 +50,12 @@ export default function AssignGroupForm() {
 
     const fetchData = async () => {
         try {
-            // const [,courseRes] = await Promise.all([
-            //     ,
-            //     getOrgCourses(),
-            // ]);
+
             const orgRes=await getGroups();
             const courseRes=await getOrgCourses()
-            setgroups(orgRes.res);
+            console.log(orgRes.data)
+            setgroups(orgRes.data);
+            console.log(courseRes)
             setCourses(courseRes.res);
         } catch (err) {
             toast.error("Failed to load data");
