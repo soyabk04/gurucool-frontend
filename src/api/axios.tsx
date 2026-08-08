@@ -50,6 +50,7 @@ api.interceptors.response.use(
   "/login",
   "/forgot-password",
   "/user/reset-password",
+  "/change-password"
 ];
       if (!PUBLIC_ROUTES.includes(window.location.pathname)) {
         window.location.href = "/login";

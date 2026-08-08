@@ -33,3 +33,20 @@ export const forgotPassword = async (data: { email: string }) => {
   const response = await api.post("/auth/send-reset-password-email", data);
   return response.data;
 };
+
+export interface ChangePasswordData {
+  token: string;
+  newpass: string;
+}
+
+export const changePassword = async ({
+  token,
+  newpass,
+}: ChangePasswordData) => {
+  const response = await api.post("/auth/change-password", {
+    token,
+    newpass,
+  });
+
+  return response.data;
+};

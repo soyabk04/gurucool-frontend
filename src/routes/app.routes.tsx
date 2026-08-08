@@ -6,7 +6,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 import LoginPage from "@/pages/Login";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-// import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import ChangePasswordPage from "@/pages/changePassPage";
 
 import Dashboard from "@/pages/Dashboard";
 import OrganizationPage from "@/pages/OrganizationPage";
@@ -53,7 +53,13 @@ export default function AppRoutes() {
             <ForgotPasswordPage />
           </LoggedInRoute>}
       />
-
+      <Route
+        path="/change-password"
+        element={
+          <LoggedInRoute>
+            <ChangePasswordPage />
+          </LoggedInRoute>}
+      />
       {/* Uncomment after creating the page */}
       {/*
       <Route
