@@ -1,32 +1,32 @@
-import {
-  ChevronUp,
-} from "lucide-react";
+// import {
+//   ChevronUp,
+// } from "lucide-react";
 
 // import {
 //   Avatar,
 //   AvatarFallback,
 // } from "@/components/ui/avatar";
 
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 
 import {
-  DropdownMenu,
+  // DropdownMenu,
   DropdownMenuContent,
-  // DropdownMenuItem,
+  DropdownMenuItem,
   // DropdownMenuLabel,
-  // DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  // DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 
-// import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 // import { useTheme } from "@/context/ThemeContext";
 
 export function UserMenu() {
-  // const { user, logout } = useAuth();
+  const { user} = useAuth();
   // const { theme } = useTheme();
 
-  // if (!user) return null;
+  if (!user) return null;
 
   // const initials = (user as { name: string }).name
   //   .split(" ")
@@ -40,29 +40,27 @@ export function UserMenu() {
   // }
 
   return (
-<DropdownMenu>
-  <DropdownMenuTrigger
-    render={
-      <Button
-        variant="ghost"
-        className="h-auto w-full justify-between rounded-xl p-3"
-      >
-        User Menu
-        <ChevronUp className="h-4 w-4" />
-      </Button>
-    }
-  />
+<DropdownMenuContent align="end" className="w-72">
+  <div className="p-2">
+    <p>{user.name}</p>
+    <p>{user.role}</p>
+  </div>
 
-  <DropdownMenuContent align="end" className="w-72">
-    <div className="p-2">
-      Test
-    </div>
-  </DropdownMenuContent>
-    <DropdownMenuContent align="end" className="w-72">
-    <div className="p-2">
-      Test
-    </div>
-  </DropdownMenuContent>
-</DropdownMenu>
+  <DropdownMenuSeparator />
+
+  <DropdownMenuItem>
+    Profile
+  </DropdownMenuItem>
+
+  <DropdownMenuItem>
+    Settings
+  </DropdownMenuItem>
+
+  <DropdownMenuSeparator />
+
+  <DropdownMenuItem>
+    Logout
+  </DropdownMenuItem>
+</DropdownMenuContent>
   )
 }
