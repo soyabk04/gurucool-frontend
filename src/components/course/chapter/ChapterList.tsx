@@ -1,5 +1,5 @@
 import ChapterCard from "./ChapterCard";
-
+// import { BookOpen } from "lucide-react";
 import type { Chapter } from "@/types/course";
 
 interface ChapterListProps {
@@ -18,13 +18,21 @@ export default function ChapterList({
   }
 
   return (
-    <div className="space-y-4">
-      {chapters.map((chapter) => (
-        <ChapterCard
-          key={chapter._id}
-          chapter={chapter}
-        />
-      ))}
+<div className="space-y-3">
+  {chapters.map((chapter, index) => (
+    <div
+      key={chapter._id}
+      className="flex items-start gap-3"
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-muted/40 text-sm font-medium text-muted-foreground">
+        {index + 1}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <ChapterCard chapter={chapter} />
+      </div>
     </div>
+  ))}
+</div>
   );
 }
