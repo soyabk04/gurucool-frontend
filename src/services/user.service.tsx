@@ -1,14 +1,23 @@
 import { api } from "@/api/axios";
 
-export const getUsers = async (organizationId?: string) => {
-  if (!organizationId) {
-    const response = await api.get("/auth/getusers");
-    return response.data;
-  } else {
-    const response = await api.get(`/auth/getusers/?organizationId=${organizationId}`);
-    return response.data;
-  }
+export const getUsers = async ({
+  organizationId,
+  page = 1,
+  limit = 10,
+}: {
+  organizationId?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  const response = await api.get("/auth/getusers", {
+    params: {
+      page,
+      limit,
+      ...(organizationId && { organizationId }),
+    },
+  });
 
+  return response.data;
 };
 
 export const createUsers = async (data:any[]) => {
@@ -47,6 +56,27 @@ export const changePassword = async ({
     token,
     newpass,
   });
+
+  return response.data;
+};
+
+interface ChangemyPasswordData {
+  currentPassword: string;
+  newPassword: string;
+}
+
+interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export const changemyPassword = async (
+  data: ChangemyPasswordData
+): Promise<ChangePasswordResponse> => {
+  const response = await api.patch(
+    "/auth/change-mypassword",
+    data
+  );
 
   return response.data;
 };

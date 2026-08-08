@@ -29,7 +29,6 @@ export interface NavigationGroup {
 export const navigation: NavigationGroup[] = [
   {
     title: "Overview",
-
     items: [
       {
         title: "Dashboard",
@@ -122,6 +121,17 @@ export const navigation: NavigationGroup[] = [
     title: "Administration",
 
     items: [
+                  {
+        title: "Change Password",
+        href: "/change-mypassword",
+        icon: Settings,
+        roles: [
+          "superadmin",
+          "admin",
+          "coordinator",
+          "user"
+        ],
+      },
       {
         title: "Settings",
         href: "/settings",

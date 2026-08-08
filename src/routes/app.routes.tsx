@@ -25,7 +25,7 @@ import AssignGroupCourse from "@/pages/admin/AssignOrganizationCourse";
 import AssignCoursePage from "@/pages/coordinator/AssignCoursePage";
 import OrganizationSettingsPage from "@/pages/OrganizationSettingsPage";
 import ChapterPage from "@/pages/ChapterPage";
-
+import ChangemyPasswordPage from "@/pages/changeMyPassword"
 import NotFound from "@/pages/NotFound";
 
 export default function AppRoutes() {
@@ -79,6 +79,10 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        <Route
+  path="/change-mypassword"
+  element={<ChangemyPasswordPage/>}
+/>
         
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/orgsetting" element={<OrganizationSettingsPage />} />
