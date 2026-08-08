@@ -60,31 +60,71 @@ export default function ChapterPage() {
     );
   }
 
-  return (
-    <main className="mx-auto max-w-7xl p-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        {/* Main Content */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">{chapter.title}</h1>
+return (
+  <main className="mx-auto w-full max-w-7xl p-6">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      {/* Main Content */}
+      <div className="min-w-0 space-y-5">
+        {/* Chapter Header */}
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Course</span>
 
-            {chapter.description && (
-              <p className="mt-2 text-muted-foreground">
-                {chapter.description}
-              </p>
-            )}
+            <span>/</span>
+
+            <span>Chapter</span>
           </div>
 
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                {chapter.title}
+              </h1>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Chapter {chapters.findIndex(
+                  (item:any) => item._id === chapterId
+                ) + 1}{" "}
+                of {chapters.length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Video */}
+        <div className="overflow-hidden rounded-2xl border bg-black shadow-sm">
           <VideoPlayer videoUrl={chapter.videoUrl} />
         </div>
 
-        {/* Sidebar */}
+        {/* Bottom Information */}
+        <div className="rounded-2xl border bg-card p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Current Chapter
+              </p>
+
+              <h2 className="mt-1 text-base font-semibold">
+                {chapter.title}
+              </h2>
+            </div>
+
+            <div className="rounded-lg bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+              Video
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar */}
+      <aside className="lg:sticky lg:top-6 lg:self-start">
         <ChapterSidebar
           courseId={courseId!}
           chapters={chapters}
           currentChapterId={chapterId!}
         />
-      </div>
-    </main>
-  );
+      </aside>
+    </div>
+  </main>
+);
 }
