@@ -23,6 +23,7 @@ export default function VideoPlayer({
 
       <video
         controls
+        controlsList="nodownload"
         preload="metadata"
         poster={poster}
         className="aspect-video w-full bg-black"
