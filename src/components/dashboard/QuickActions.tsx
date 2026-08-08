@@ -29,7 +29,7 @@ const actions: Action[] = [
     title: "Create Group",
     description: "Organize learners",
     icon: FolderPlus,
-    href: "/groups/create",
+    href: "/groups",
   },
   {
     title: "Assign Course",
@@ -53,7 +53,7 @@ const actions: Action[] = [
     title: "New Course",
     description: "Create course",
     icon: Plus,
-    href: "/courses/create",
+    href: "/courses/new",
   },
 ];
 

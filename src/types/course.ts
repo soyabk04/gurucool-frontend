@@ -28,9 +28,14 @@ export interface Chapter {
   title: string;
   description: string;
   type: ChapterType;
-  fileUrl: string;
+  videoUrl: string;
   order: number;
   course: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ChapterWithProgress extends Chapter {
+  completed: boolean;
+  watchedDuration: number;
 }

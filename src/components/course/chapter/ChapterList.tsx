@@ -84,7 +84,7 @@ export default function ChapterList({
           <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
             {/* Type */}
             <span className="flex items-center gap-1.5">
-              {chapter.fileUrl ? (
+              {chapter.videoUrl ? (
                 <>
                   <Video className="h-3.5 w-3.5" />
                   Video

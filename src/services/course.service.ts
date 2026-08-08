@@ -56,3 +56,65 @@ export const getMyCourses = async () => {
   const res = await api.get("/courses/cour");
   return res.data;
 };
+
+
+export interface ChapterProgress {
+  _id: string;
+  title: string;
+  order: number;
+  type: "video" | "pdf";
+  watchedDuration: number;
+  completed: boolean;
+}
+
+export interface CourseProgress {
+  courseId: string;
+  progress: number;
+  percentage: number;
+  totalChapters: number;
+  completedChapters: number;
+  chapters: ChapterProgress[];
+}
+
+interface UpdateChapterProgressData {
+  courseId: string;
+  chapterId: string;
+  watchedDuration: number;
+  completed?: boolean;
+}
+
+/**
+ * Get the current user's progress for a course.
+ */
+export const getCourseProgress = async (
+  courseId: string
+): Promise<CourseProgress> => {
+  const { data } = await api.get(
+    `/courses/progress/${courseId}`
+  );
+
+  return data.data;
+};
+
+/**
+ * Update watched duration / completion for a chapter.
+ *
+ * If the progress document doesn't exist on the backend,
+ * the backend creates it using upsert.
+ */
+export const updateChapterProgress = async ({
+  courseId,
+  chapterId,
+  watchedDuration,
+  completed = false,
+}: UpdateChapterProgressData) => {
+  const response = await api.patch(
+    `/courses/${courseId}/chapters/${chapterId}/progress`,
+    {
+      watchedDuration,
+      completed,
+    }
+  );
+  console.log(response)
+  return response.data.data;
+};

@@ -20,7 +20,7 @@ export default function CreateOrganizationDialog() {
       <DialogTrigger >
 
         <Button>
-          Create Organization
+          Create Group
         </Button>
 
       </DialogTrigger>

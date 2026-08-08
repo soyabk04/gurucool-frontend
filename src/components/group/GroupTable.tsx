@@ -28,9 +28,9 @@ export default function GroupTable() {
     const fetchGroups = async () => {
       try {
         const response = await getGroups();
-
+        console.log(response)
         if (response.success) {
-          setGroups(response.res);
+          setGroups(response.data);
         }
       } catch (error:any) {
         alert(`Failed to fetch groups: ${error}`)
