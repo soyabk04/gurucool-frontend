@@ -58,6 +58,11 @@ export function UserMenu() {
       Test
     </div>
   </DropdownMenuContent>
+    <DropdownMenuContent align="end" className="w-72">
+    <div className="p-2">
+      Test
+    </div>
+  </DropdownMenuContent>
 </DropdownMenu>
   )
 }
