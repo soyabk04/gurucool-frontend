@@ -54,91 +54,101 @@ export default function CourseForm({
   };
 
   return (
-    <Card className="max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle>Create Course</CardTitle>
-      </CardHeader>
+<Card className="mx-auto w-full max-w-3xl">
+  <CardHeader>
+    <CardTitle className="text-xl">Create Course</CardTitle>
+    <p className="text-sm text-muted-foreground">
+      Add the basic information for your new course.
+    </p>
+  </CardHeader>
 
-      <CardContent>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
-          {/* Title */}
+  <CardContent>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Course Title */}
+      <div className="space-y-2">
+        <Label htmlFor="course-title">Course Title</Label>
 
-          <div className="space-y-2">
-            <Label>Course Title</Label>
+        <Input
+          id="course-title"
+          value={form.title}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              title: e.target.value,
+            }))
+          }
+          placeholder="React Complete Course"
+          className="h-11"
+        />
+      </div>
 
-            <Input
-              value={form.title}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  title: e.target.value,
-                }))
-              }
-              placeholder="React Complete Course"
+      {/* Description */}
+      <div className="space-y-2">
+        <Label htmlFor="course-description">Description</Label>
+
+        <Textarea
+          id="course-description"
+          rows={6}
+          value={form.description}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              description: e.target.value,
+            }))
+          }
+          placeholder="Write a description for your course..."
+          className="resize-none"
+        />
+      </div>
+
+      {/* Thumbnail */}
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="course-thumbnail">Course Thumbnail</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Upload an image that represents your course.
+          </p>
+        </div>
+
+        <Input
+          id="course-thumbnail"
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0] ?? null;
+
+            setForm((prev) => ({
+              ...prev,
+              thumbnail: file,
+            }));
+
+            if (file) {
+              setPreview(URL.createObjectURL(file));
+            }
+          }}
+        />
+
+        {preview && (
+          <div className="overflow-hidden rounded-lg border bg-muted">
+            <img
+              src={preview}
+              alt="Course thumbnail preview"
+              className="aspect-video w-full object-cover"
             />
           </div>
+        )}
+      </div>
 
-          {/* Description */}
-
-          <div className="space-y-2">
-            <Label>Description</Label>
-
-            <Textarea
-              rows={5}
-              value={form.description}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Write course description..."
-            />
-          </div>
-
-          {/* Thumbnail */}
-
-          <div className="space-y-2">
-            <Label>Thumbnail</Label>
-
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-
-                setForm((prev) => ({
-                  ...prev,
-                  thumbnail: file,
-                }));
-
-                if (file) {
-                  setPreview(URL.createObjectURL(file));
-                }
-              }}
-            />
-
-            {preview && (
-              <img
-                src={preview}
-                alt="Thumbnail Preview"
-                className="h-40 rounded-md border object-cover"
-              />
-            )}
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? "Creating..." : "Create Course"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      {/* Submit */}
+      <Button
+        type="submit"
+        className="h-11 w-full"
+        disabled={loading}
+      >
+        {loading ? "Creating Course..." : "Create Course"}
+      </Button>
+    </form>
+  </CardContent>
+</Card>
   );
 }
