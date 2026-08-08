@@ -2,20 +2,22 @@ import { Card } from "@/components/ui/card";
 
 interface VideoPlayerProps {
   videoUrl: string;
-  title?: string;
   poster?: string;
+  title?: string;
 }
 
-export default function VideoPlayer({
+export function VideoPlayer({
   videoUrl,
-  title,
   poster,
+  title,
 }: VideoPlayerProps) {
   return (
-    <Card className="overflow-hidden rounded-2xl p-0 shadow-xl">
+    <Card className="overflow-hidden rounded-2xl border bg-card shadow-sm">
       {title && (
-        <div className="border-b px-6 py-4">
-          <h2 className="text-xl font-semibold">{title}</h2>
+        <div className="border-b px-4 py-3">
+          <h2 className="truncate text-sm font-medium">
+            {title}
+          </h2>
         </div>
       )}
 
@@ -26,6 +28,8 @@ export default function VideoPlayer({
         className="aspect-video w-full bg-black"
       >
         <source src={videoUrl} type="video/mp4" />
+
+        Your browser does not support the video tag.
       </video>
     </Card>
   );
