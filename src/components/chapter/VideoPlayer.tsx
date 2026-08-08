@@ -6,7 +6,7 @@ interface VideoPlayerProps {
   title?: string;
 }
 
-export function VideoPlayer({
+export default function VideoPlayer({
   videoUrl,
   poster,
   title,
