@@ -33,7 +33,7 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const initials = (user as { name: string, role: string }).name
+  const initials = (user as { name: string }).name
     .split(" ")
     .map((part) => part[0])
     .join("")
@@ -46,44 +46,39 @@ export function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger >
-        <Button
-          variant="ghost"
-          className="h-auto w-full justify-between rounded-xl p-3"
-        >
-          <div className="flex items-center gap-3">
-            <Avatar
-              className="h-10 w-10 border"
-              style={{
-                borderColor: theme?.primaryColor,
-              }}
-            >
-              <AvatarImage src={(user as any).avatar} />
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="ghost"
+            className="h-auto w-full justify-between rounded-xl p-3"
+          >
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10 border">
+                <AvatarFallback
+                  style={{
+                    backgroundColor: theme?.primaryColor,
+                    color: "white",
+                  }}
+                >
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
 
-              <AvatarFallback
-                style={{
-                  backgroundColor: theme?.primaryColor,
-                  color: "white",
-                }}
-              >
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+              <div className="min-w-0 text-left">
+                <p className="truncate text-sm font-semibold">
+                  {user.name}
+                </p>
 
-            <div className="min-w-0 text-left">
-              <p className="truncate text-sm font-semibold">
-                {user.name}
-              </p>
-
-              <p className="truncate text-xs text-muted-foreground">
-                {user.role}
-              </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {user.role}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-        </Button>
-      </DropdownMenuTrigger>
+            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        }
+      />
 
       <DropdownMenuContent
         align="end"
