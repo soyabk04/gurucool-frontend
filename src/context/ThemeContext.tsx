@@ -27,7 +27,7 @@ interface ThemeContextValue {
 const defaultTheme: Theme = {
   name: "GuruCool",
   domain:'none',
-  logoUrl: "/logo.png",
+  logoUrl: "../../public/TWE_logo.png",
   primaryColor: "#063B00",
   secondaryColor: "#64748b",
 };
