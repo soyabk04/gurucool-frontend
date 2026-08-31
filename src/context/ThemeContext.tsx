@@ -29,7 +29,7 @@ const defaultTheme: Theme = {
   domain:'none',
   logoUrl: "https://i.ibb.co/ks9vGD5k/TWE-logo.png",
   primaryColor: "#063B00",
-  secondaryColor: "#64748b",
+  secondaryColor: "white",
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);

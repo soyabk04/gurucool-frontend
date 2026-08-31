@@ -16,7 +16,7 @@ export function SidebarHeader() {
             ${theme?.primaryColor}18,
             ${theme?.secondaryColor}12
           )`,
-          borderColor: `${theme?.primaryColor}35`,
+          borderColor: `${theme?.secondaryColor}35`,
         }}
       >
         <div className="flex items-center gap-4 p-4">
@@ -24,7 +24,7 @@ export function SidebarHeader() {
           <div
             className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl shadow-md"
             style={{
-              backgroundColor: theme?.primaryColor,
+              backgroundColor: theme?.secondaryColor,
             }}
           >
             <img

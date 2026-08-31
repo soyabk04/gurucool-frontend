@@ -1,3 +1,4 @@
+
 import {
   Cell,
   Label,
@@ -33,13 +34,20 @@ const COLORS: Record<CompletionData["name"], string> = {
 export function CompletionChart({
   data,
 }: CompletionChartProps) {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const total = data.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
 
   const completed =
-    data.find((item) => item.name === "Completed")?.value ?? 0;
+    data.find(
+      (item) => item.name === "Completed"
+    )?.value ?? 0;
 
   const percentage =
-    total === 0 ? 0 : Math.round((completed / total) * 100);
+    total === 0
+      ? 0
+      : Math.round((completed / total) * 100);
 
   return (
     <Card className="rounded-2xl">
@@ -52,101 +60,126 @@ export function CompletionChart({
       </CardHeader>
 
       <CardContent>
-        <div className="h-[260px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                innerRadius={70}
-                outerRadius={95}
-                paddingAngle={4}
-                dataKey="value"
+        {total === 0 ? (
+          <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
+            No enrollment data available.
+          </div>
+        ) : (
+          <>
+            <div className="h-[260px]">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
               >
-                {data.map((entry) => (
-                  <Cell
-                    key={entry.name}
-                    fill={COLORS[entry.name]}
+                <PieChart>
+                  <Pie
+                    data={data}
+                    innerRadius={70}
+                    outerRadius={95}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {data.map((entry) => (
+                      <Cell
+                        key={entry.name}
+                        fill={COLORS[entry.name]}
+                      />
+                    ))}
+
+                    <Label
+                      position="center"
+                      content={({ viewBox }) => {
+                        if (
+                          !viewBox ||
+                          !("cx" in viewBox) ||
+                          !("cy" in viewBox)
+                        ) {
+                          return null;
+                        }
+
+                        return (
+                          <text
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                          >
+                            <tspan
+                              x={viewBox.cx}
+                              dy="-4"
+                              className="fill-foreground text-2xl font-bold"
+                            >
+                              {percentage}%
+                            </tspan>
+
+                            <tspan
+                              x={viewBox.cx}
+                              dy={22}
+                              className="fill-muted-foreground text-sm"
+                            >
+                              Completed
+                            </tspan>
+                          </text>
+                        );
+                      }}
+                    />
+                  </Pie>
+
+                  <Tooltip
+                    formatter={(value) => [
+                      Number(value ?? 0),
+                      "Students",
+                    ]}
                   />
-                ))}
-
-                <Label
-                  position="center"
-                  content={({ viewBox }) => {
-                    if (
-                      !viewBox ||
-                      !("cx" in viewBox) ||
-                      !("cy" in viewBox)
-                    ) {
-                      return null;
-                    }
-
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          className="fill-foreground text-2xl font-bold"
-                        >
-                          {percentage}%
-                        </tspan>
-
-                        <tspan
-                          x={viewBox.cx}
-                          dy={22}
-                          className="fill-muted-foreground text-sm"
-                        >
-                          Completed
-                        </tspan>
-                      </text>
-                    );
-                  }}
-                />
-              </Pie>
-
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="mt-6 space-y-4">
-          {data.map((item) => (
-            <div
-              key={item.name}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{
-                    backgroundColor: COLORS[item.name],
-                  }}
-                />
-
-                <span className="text-sm">
-                  {item.name}
-                </span>
-              </div>
-
-              <div className="text-right">
-                <p className="font-semibold">
-                  {item.value}
-                </p>
-
-                <p className="text-xs text-muted-foreground">
-                  {total === 0
-                    ? 0
-                    : Math.round((item.value / total) * 100)}
-                  %
-                </p>
-              </div>
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-          ))}
-        </div>
+
+            <div className="mt-6 space-y-4">
+              {data.map((item) => {
+                const itemPercentage =
+                  total === 0
+                    ? 0
+                    : Math.round(
+                        (item.value / total) * 100
+                      );
+
+                return (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{
+                          backgroundColor:
+                            COLORS[item.name],
+                        }}
+                      />
+
+                      <span className="text-sm">
+                        {item.name}
+                      </span>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-semibold">
+                        {item.value}
+                      </p>
+
+                      <p className="text-xs text-muted-foreground">
+                        {itemPercentage}%
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
 }
+

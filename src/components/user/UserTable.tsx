@@ -17,7 +17,7 @@ interface User {
   email: string;
   ID: string;
   role: string;
-  group: string;
+  groupId: any;
 }
 
 interface UserTableProps {
@@ -66,7 +66,7 @@ export default function UserTable({
 
       if (response.success) {
         setUsers(response.users);
-
+       console.log(users)
         setPagination({
           page: response.pagination.page,
           limit: response.pagination.limit,
@@ -136,7 +136,7 @@ export default function UserTable({
                 </TableCell>
 
                 <TableCell>
-                  {user.group || "-"}
+                  {user.groupId?.groupCode || "-"}
                 </TableCell>
               </TableRow>
             ))}

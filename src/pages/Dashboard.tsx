@@ -12,6 +12,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/services/auth.service";
 import AdminDashboardPage from "./adminDashboard";
+import CoordinatorDashboardPage from "./coordinatorDashboard";
+import UserDashboardPage from "./UserDashboardPage";
 
 interface QuickAction {
   title: string;
@@ -86,11 +88,22 @@ const Dashboard = () => {
   const actions = user
     ? QUICK_ACTIONS.filter((action) => action.roles.includes(user.role))
     : [];
-if(user?.role=="admin"){
-  return(
-  <AdminDashboardPage />
-);
-}
+  if (user?.role == "admin") {
+    return (
+      <AdminDashboardPage />
+    );
+  }
+
+  if (user?.role == "coordinator") {
+    return (
+      <CoordinatorDashboardPage />
+    );
+  }
+    if (user?.role == "user") {
+    return (
+      <UserDashboardPage />
+    );
+  }
   return (
     <div className="space-y-8">
       <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 ring-1 ring-primary/10 sm:p-8">
@@ -99,9 +112,7 @@ if(user?.role=="admin"){
           Welcome back{user?.name ? `, ${user.name}` : ""}
         </h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-          {user?.role === "user"
-            ? "Pick up where you left off, or explore courses assigned to you."
-            : "Here's a quick jump-off point to manage your organization."}
+          
         </p>
       </div>
 

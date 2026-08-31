@@ -126,3 +126,60 @@ export interface LowestGroup {
 
   completion: number;
 }
+
+export interface CoordinatorDashboardData {
+  group: {
+    id: string;
+    name: string;
+    groupCode?: string;
+  };
+
+  stats: {
+    totalStudents: number;
+    activeStudents: number;
+    totalCourses: number;
+    totalEnrollments: number;
+    averageProgress: number;
+    completionRate: number;
+  };
+
+  charts: {
+    studentActivity: {
+      day: string;
+      activeStudents: number;
+    }[];
+
+    coursePerformance: {
+      id: string;
+      name: string;
+      students: number;
+      progress: number;
+      completed: number;
+      completionRate: number;
+    }[];
+
+    completion: {
+      name: string;
+      value: number;
+    }[];
+  };
+
+  studentsNeedingAttention: {
+    id: string;
+    name: string;
+    email: string;
+    course: string;
+    progress: number;
+    status: string;
+    updatedAt: string;
+  }[];
+
+  recentActivities: {
+    _id: string;
+    user: string;
+    action: string;
+    target: string;
+    progress: number;
+    createdAt: string;
+  }[];
+}
