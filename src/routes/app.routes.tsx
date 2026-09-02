@@ -27,6 +27,7 @@ import OrganizationSettingsPage from "@/pages/OrganizationSettingsPage";
 import ChapterPage from "@/pages/ChapterPage";
 import ChangemyPasswordPage from "@/pages/changeMyPassword"
 import NotFound from "@/pages/NotFound";
+import CreateChapterPage from "@/pages/CreateChapterPage";
 
 export default function AppRoutes() {
   return (
@@ -83,9 +84,14 @@ export default function AppRoutes() {
   path="/change-mypassword"
   element={<ChangemyPasswordPage/>}
 />
+
         
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/orgsetting" element={<OrganizationSettingsPage />} />
+        <Route
+          path="/courses/:courseId/chapters/create"
+          element={<CreateChapterPage />}
+        />
         <Route
           path="/courses/assign-course"
           element={

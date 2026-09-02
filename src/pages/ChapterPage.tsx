@@ -3,10 +3,23 @@ import { useParams } from "react-router-dom";
 
 import VideoPlayer from "@/components/chapter/VideoPlayer";
 import ChapterSidebar from "@/components/chapter/ChapterSidebar";
+import ChapterQuiz from "@/components/course/chapter/ChapterQuiz";
 
-import { getChapter } from "@/services/chapter.service";
-import { getChapters } from "@/services/chapter.services";
-import type { Chapter, ChapterWithProgress } from "@/types/course"
+import {
+  getChapters,
+  getChapter,
+} from "@/services/chapter.services";
+
+import {
+  getQuizQuestions,
+} from "@/services/quiz.service";
+
+import type {
+  Chapter,
+  ChapterWithProgress,
+  QuizQuestion,
+} from "@/types/course";
+
 import {
   getCourseProgress,
   updateChapterProgress,
@@ -16,9 +29,11 @@ import {
 import axios from "axios";
 import { toast } from "sonner";
 
-
 export default function ChapterPage() {
-  const { chapterId, courseId } = useParams<{
+  const {
+    chapterId,
+    courseId,
+  } = useParams<{
     chapterId: string;
     courseId: string;
   }>();
@@ -32,10 +47,34 @@ export default function ChapterPage() {
   const [courseProgress, setCourseProgress] =
     useState<CourseProgress | null>(null);
 
-  const [loading, setLoading] = useState(true);
-  courseProgress
+  const [quizQuestions, setQuizQuestions] =
+    useState<QuizQuestion[]>([]);
+
+  const [showQuiz, setShowQuiz] =
+    useState(false);
+
+  const [quizLoading, setQuizLoading] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  /*
+   * --------------------------------------------------
+   * Chapter access error
+   * --------------------------------------------------
+   */
+
+  const [accessError, setAccessError] =
+    useState<{
+      code: string;
+      message: string;
+    } | null>(null);
+   courseProgress
   /**
+   * --------------------------------------------------
    * Fetch chapter + chapters + progress
+   * --------------------------------------------------
    */
   useEffect(() => {
     const fetchData = async () => {
@@ -45,32 +84,43 @@ export default function ChapterPage() {
 
       try {
         setLoading(true);
+        setAccessError(null);
+
+        /*
+         * --------------------------------------------------
+         * First request chapter.
+         *
+         * Backend performs:
+         * - enrollment check
+         * - chapter access-date check
+         * - expiration check
+         * - previous chapter check
+         * --------------------------------------------------
+         */
+
+        const chapterData =
+          await getChapter(chapterId);
+
+        /*
+         * --------------------------------------------------
+         * Only fetch the rest if chapter access succeeds.
+         * --------------------------------------------------
+         */
 
         const [
-          chapterData,
           chaptersData,
           progressData,
         ] = await Promise.all([
-          getChapter(chapterId),
           getChapters(courseId),
           getCourseProgress(courseId),
         ]);
-        console.log(chapterData,
-          chaptersData,
-          progressData,)
-        setChapter({
-          ...chapterData,
-          completed: false,
-          watchedDuration: 0,
-        });
 
         /*
-         * Merge backend progress with chapters.
-         *
-         * getChapters() gives us the course chapters.
-         * getCourseProgress() gives us completed/
-         * watchedDuration for the current user.
+         * --------------------------------------------------
+         * Merge backend progress with chapters
+         * --------------------------------------------------
          */
+
         const progressMap = new Map(
           progressData.chapters.map((item) => [
             item._id,
@@ -79,50 +129,114 @@ export default function ChapterPage() {
         );
 
         const chaptersWithProgress =
-          chaptersData.map((item: Chapter) => {
-            const progress = progressMap.get(item._id);
+          chaptersData.map(
+            (item: Chapter) => {
+              const progress =
+                progressMap.get(item._id);
 
-            return {
-              ...item,
-              completed:
-                progress?.completed ?? false,
-              watchedDuration:
-                progress?.watchedDuration ?? 0,
-            };
-          });
+              return {
+                ...item,
+                completed:
+                  progress?.completed ??
+                  false,
+                watchedDuration:
+                  progress?.watchedDuration ??
+                  0,
+              };
+            }
+          );
 
-        setChapters(chaptersWithProgress);
+        setChapters(
+          chaptersWithProgress
+        );
 
         /*
-         * Also update the current chapter with
-         * the user's progress.
+         * --------------------------------------------------
+         * Current chapter progress
+         * --------------------------------------------------
          */
+
         const currentProgress =
           progressMap.get(chapterId);
 
         setChapter({
           ...chapterData,
           completed:
-            currentProgress?.completed ?? false,
+            currentProgress?.completed ??
+            false,
           watchedDuration:
-            currentProgress?.watchedDuration ?? 0,
+            currentProgress?.watchedDuration ??
+            0,
         });
 
-        setCourseProgress(progressData);
+        setCourseProgress(
+          progressData
+        );
+
+        /*
+         * --------------------------------------------------
+         * Reset quiz state whenever user
+         * navigates to another chapter.
+         * --------------------------------------------------
+         */
+
+        setQuizQuestions([]);
+        setShowQuiz(false);
       } catch (error) {
+        console.error(
+          "Failed to load chapter:",
+          error
+        );
+
         if (axios.isAxiosError(error)) {
-          console.error(error.response?.status);
-          console.error(
-            error.response?.data?.message
-          );
+          const status =
+            error.response?.status;
+
+          const code =
+            error.response?.data?.code;
+
+          const message =
+            error.response?.data?.message;
+
+          /*
+           * --------------------------------------------------
+           * Chapter access errors
+           * --------------------------------------------------
+           */
+
+          if (
+            status === 403 &&
+            (
+              code ===
+                "CHAPTER_NOT_AVAILABLE" ||
+              code ===
+                "CHAPTER_ACCESS_EXPIRED" ||
+              code ===
+                "CHAPTER_LOCKED" ||
+              code ===
+                "CHAPTER_ACCESS_NOT_CONFIGURED"
+            )
+          ) {
+            setAccessError({
+              code:
+                code ||
+                "CHAPTER_ACCESS_DENIED",
+              message:
+                message ||
+                "You cannot access this chapter.",
+            });
+
+            return;
+          }
 
           toast.error(
-            error.response?.data?.message ||
-            "Failed to load chapter"
+            message ||
+              "Failed to load chapter"
           );
         } else {
-          console.error(error);
-          toast.error("Failed to load chapter");
+          toast.error(
+            "Failed to load chapter"
+          );
         }
       } finally {
         setLoading(false);
@@ -133,7 +247,9 @@ export default function ChapterPage() {
   }, [chapterId, courseId]);
 
   /**
+   * --------------------------------------------------
    * Save watched duration
+   * --------------------------------------------------
    */
   const handleProgress = async (
     watchedDuration: number
@@ -157,83 +273,191 @@ export default function ChapterPage() {
   };
 
   /**
-   * Complete chapter when video ends
+   * --------------------------------------------------
+   * Video ended
+   *
+   * IMPORTANT:
+   * We DO NOT complete the chapter here.
+   *
+   * Instead, fetch the quiz and display it
+   * in the same location as the video.
+   * --------------------------------------------------
    */
-  const handleChapterComplete = async (
-    watchedDuration: number
-  ) => {
-    if (!courseId || !chapterId) {
-      return;
-    }
+  const handleVideoEnded =
+    async () => {
+      if (!chapterId) {
+        return;
+      }
 
-    try {
-      const updated =
-        await updateChapterProgress({
-          courseId,
-          chapterId,
-          watchedDuration,
-          completed: true,
-        });
+      try {
+        setQuizLoading(true);
 
-      /*
-       * Update current chapter
-       */
-      setChapter((prev) =>
-        prev
-          ? {
-            ...prev,
-            completed: true,
+        const questions =
+          await getQuizQuestions(
+            chapterId
+          );
+
+        setQuizQuestions(
+          questions
+        );
+
+        setShowQuiz(true);
+      } catch (error) {
+        console.error(
+          "Failed to load chapter quiz:",
+          error
+        );
+
+        if (
+          axios.isAxiosError(error)
+        ) {
+          toast.error(
+            error.response?.data
+              ?.message ||
+              "Failed to load quiz"
+          );
+        } else {
+          toast.error(
+            "Failed to load quiz"
+          );
+        }
+      } finally {
+        setQuizLoading(false);
+      }
+    };
+
+  /**
+   * --------------------------------------------------
+   * Called ONLY after the student passes the quiz.
+   * --------------------------------------------------
+   */
+  const handleChapterComplete =
+    async () => {
+      if (
+        !courseId ||
+        !chapterId ||
+        !chapter
+      ) {
+        return;
+      }
+
+      try {
+        const watchedDuration =
+          chapter.watchedDuration ||
+          0;
+
+        const updated =
+          await updateChapterProgress({
+            courseId,
+            chapterId,
             watchedDuration,
-          }
-          : prev
-      );
+            completed: true,
+          });
 
-      /*
-       * Update sidebar
-       */
-      setChapters((prev) =>
-        prev.map((item) =>
-          item._id === chapterId
+        /*
+         * --------------------------------------------------
+         * Update current chapter
+         * --------------------------------------------------
+         */
+
+        setChapter((prev) =>
+          prev
             ? {
-              ...item,
-              completed: true,
-              watchedDuration,
-            }
-            : item
-        )
-      );
+                ...prev,
+                completed: true,
+              }
+            : prev
+        );
 
-      /*
-       * Update course progress locally
-       */
-      setCourseProgress((prev) =>
-        prev
-          ? {
+        /*
+         * --------------------------------------------------
+         * Update sidebar
+         * --------------------------------------------------
+         */
+
+        setChapters((prev) =>
+          prev.map((item) =>
+            item._id === chapterId
+              ? {
+                  ...item,
+                  completed: true,
+                }
+              : item
+          )
+        );
+
+        /*
+         * --------------------------------------------------
+         * Update course progress
+         *
+         * We calculate the new completed count
+         * instead of blindly adding 1 because the
+         * chapter might already have been completed.
+         * --------------------------------------------------
+         */
+
+        setCourseProgress((prev) => {
+          if (!prev) {
+            return prev;
+          }
+
+          const wasAlreadyCompleted =
+            chapter.completed;
+
+          const completedChapters =
+            wasAlreadyCompleted
+              ? prev.completedChapters
+              : prev.completedChapters +
+                1;
+
+          const totalChapters =
+            prev.totalChapters ??
+            chapters.length;
+
+          const percentage =
+            totalChapters === 0
+              ? 0
+              : Math.round(
+                  (completedChapters /
+                    totalChapters) *
+                    100
+                );
+
+          return {
             ...prev,
+            completedChapters,
+            percentage,
             progress:
               updated.courseProgress ??
               prev.progress,
-            percentage:
-              updated.courseProgress ??
-              prev.percentage,
-            completedChapters:
-              prev.completedChapters + 1,
-          }
-          : prev
-      );
+          };
+        });
 
-      toast.success("Chapter completed");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message ||
-          "Failed to update progress"
+        toast.success(
+          "Chapter completed"
         );
-      } else {
-        toast.error("Failed to update progress");
+      } catch (error) {
+        if (
+          axios.isAxiosError(error)
+        ) {
+          toast.error(
+            error.response?.data
+              ?.message ||
+              "Failed to update progress"
+          );
+        } else {
+          toast.error(
+            "Failed to update progress"
+          );
+        }
       }
-    }
-  };
+    };
+
+  /**
+   * --------------------------------------------------
+   * Loading
+   * --------------------------------------------------
+   */
 
   if (loading) {
     return (
@@ -245,6 +469,93 @@ export default function ChapterPage() {
     );
   }
 
+  /**
+   * --------------------------------------------------
+   * Chapter access denied
+   * --------------------------------------------------
+   */
+
+  if (accessError) {
+    let title =
+      "Chapter Unavailable";
+
+    let icon = "🔐";
+
+    if (
+      accessError.code ===
+      "CHAPTER_NOT_AVAILABLE"
+    ) {
+      title =
+        "Chapter Not Available Yet";
+
+      icon = "🔒";
+    }
+
+    if (
+      accessError.code ===
+      "CHAPTER_ACCESS_EXPIRED"
+    ) {
+      title =
+        "Chapter Access Expired";
+
+      icon = "⌛";
+    }
+
+    if (
+      accessError.code ===
+      "CHAPTER_LOCKED"
+    ) {
+      title =
+        "Chapter Locked";
+
+      icon = "🔒";
+    }
+
+    if (
+      accessError.code ===
+      "CHAPTER_ACCESS_NOT_CONFIGURED"
+    ) {
+      title =
+        "Chapter Unavailable";
+
+      icon = "🔐";
+    }
+
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center p-6">
+        <div className="w-full max-w-md rounded-2xl border bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-muted text-2xl">
+            {icon}
+          </div>
+
+          <h1 className="text-xl font-semibold">
+            {title}
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {accessError.message}
+          </p>
+
+          <button
+            type="button"
+            onClick={() =>
+              window.history.back()
+            }
+            className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Go Back
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  /**
+   * --------------------------------------------------
+   * Chapter not found
+   * --------------------------------------------------
+   */
+
   if (!chapter) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center">
@@ -255,21 +566,43 @@ export default function ChapterPage() {
     );
   }
 
-  const chapterIndex = chapters.findIndex(
-    (item) => item._id === chapterId
-  );
+  /*
+   * --------------------------------------------------
+   * Find current chapter index
+   * --------------------------------------------------
+   */
+
+  const chapterIndex =
+    chapters.findIndex(
+      (item) =>
+        item._id === chapterId
+    );
 
   return (
     <main className="mx-auto w-full max-w-7xl p-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        {/* Main Content */}
+
+        {/* ==================================================
+            Main Content
+        =================================================== */}
+
         <div className="min-w-0 space-y-5">
+
           {/* Header */}
+
           <div>
             <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Course</span>
-              <span>/</span>
-              <span>Chapter</span>
+              <span>
+                Course
+              </span>
+
+              <span>
+                /
+              </span>
+
+              <span>
+                Chapter
+              </span>
             </div>
 
             <div className="flex items-start justify-between gap-4">
@@ -279,22 +612,63 @@ export default function ChapterPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Chapter {chapterIndex + 1} of{" "}
+                  Chapter{" "}
+                  {chapterIndex + 1}{" "}
+                  of{" "}
                   {chapters.length}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Video */}
-          <VideoPlayer
-            videoUrl={chapter.videoUrl!}
-            title={chapter.title}
-            onProgress={handleProgress}
-            onEnded={handleChapterComplete}
-          />
+          {/* ==================================================
+              Video / Quiz Area
+          =================================================== */}
 
-          {/* Bottom Information */}
+          {showQuiz ? (
+            <ChapterQuiz
+              questions={
+                quizQuestions
+              }
+              onPassed={
+                handleChapterComplete
+              }
+            />
+          ) : quizLoading ? (
+            <div className="flex aspect-video w-full items-center justify-center rounded-2xl border bg-card">
+              <div className="text-center">
+                <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+
+                <p className="text-sm font-medium">
+                  Loading quiz...
+                </p>
+
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Get ready for the chapter quiz.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <VideoPlayer
+              videoUrl={
+                chapter.videoUrl!
+              }
+              title={
+                chapter.title
+              }
+              onProgress={
+                handleProgress
+              }
+              onEnded={
+                handleVideoEnded
+              }
+            />
+          )}
+
+          {/* ==================================================
+              Bottom Information
+          =================================================== */}
+
           <div className="rounded-2xl border bg-card p-5">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -308,25 +682,37 @@ export default function ChapterPage() {
               </div>
 
               <div
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${chapter.completed
-                  ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                  : "bg-muted text-muted-foreground"
-                  }`}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  chapter.completed
+                    ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                    : "bg-muted text-muted-foreground"
+                }`}
               >
                 {chapter.completed
                   ? "Completed"
-                  : "In Progress"}
+                  : showQuiz
+                    ? "Quiz Required"
+                    : "In Progress"}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* ==================================================
+            Sidebar
+        =================================================== */}
+
         <aside className="lg:sticky lg:top-6 lg:self-start">
           <ChapterSidebar
-            courseId={courseId!}
-            chapters={chapters}
-            currentChapterId={chapterId!}
+            courseId={
+              courseId!
+            }
+            chapters={
+              chapters
+            }
+            currentChapterId={
+              chapterId!
+            }
           />
         </aside>
       </div>

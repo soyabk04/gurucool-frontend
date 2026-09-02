@@ -14,8 +14,6 @@ export interface Course {
   updatedAt: string;
 }
 
-export type ChapterType = "video" | "pdf";
-
 export interface CreateChapter {
   title: string;
   description: string;
@@ -38,4 +36,46 @@ export interface Chapter {
 export interface ChapterWithProgress extends Chapter {
   completed: boolean;
   watchedDuration: number;
+}
+
+export type ChapterType = "video" | "pdf" | "quiz"|null;
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: string;
+  marks: number;
+}
+
+export interface QuizData {
+  passingMarks: number;
+  totalMarks: number;
+  questions: QuizQuestion[];
+}
+
+export interface CreateChapter {
+  title: string;
+  description: string;
+  type: ChapterType;
+  file: File | null;
+  quizData?: QuizData;
+}
+
+export interface QuizQuestion {
+  _id: string;
+  question: string;
+  options: string[];
+  marks: number;
+}
+
+export interface QuizAnswer {
+  questionId: string;
+  answer: string;
+}
+
+export interface QuizSubmitResponse {
+  score: number;
+  totalMarks: number;
+  passingMarks: number;
+  passed: boolean;
 }
