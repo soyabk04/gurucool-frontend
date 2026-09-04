@@ -27,7 +27,6 @@ interface GroupCardProps {
 
 export default function GroupCard({
   group,
-  onEdit,
   onDelete,
 }: GroupCardProps) {
   return (
@@ -80,7 +79,7 @@ export default function GroupCard({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onEdit?.(group._id)}
+          onClick={() => window.location.href = `/groups/${group._id}/edit`}
         >
           Edit
         </Button>

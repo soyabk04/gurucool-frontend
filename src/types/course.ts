@@ -14,11 +14,11 @@ export interface Course {
   updatedAt: string;
 }
 
-export interface CreateChapter {
+export interface CreateCourse {
   title: string;
   description: string;
-  type: ChapterType;
-  file: File | null;
+  thumbnail: File | null;
+  certTemplate: File | null;
 }
 
 export interface Chapter {
@@ -78,4 +78,26 @@ export interface QuizSubmitResponse {
   totalMarks: number;
   passingMarks: number;
   passed: boolean;
+}
+
+export interface MyCertificate {
+  _id: string;
+
+  userId: string;
+
+  courseId: string;
+
+  organizationId: string;
+
+  groupId: string;
+
+  key: string;
+
+  courseTitle: string;
+
+  certificateLink?: string;
+
+  createdAt: string;
+
+  updatedAt: string;
 }

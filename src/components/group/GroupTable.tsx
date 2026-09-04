@@ -8,9 +8,9 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { getGroups } from "@/services/group.service";
+import { getGroups ,deleteGroupService} from "@/services/group.service";
 
 interface Group {
   _id: string;
@@ -23,6 +23,39 @@ interface Group {
 export default function GroupTable() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
+const deleteGroup = async (groupId: string) => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this group? This action cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await deleteGroupService(groupId);
+
+    if (response.success) {
+      toast.success(
+        response.message || "Group deleted successfully"
+      );
+
+      setGroups((prev) =>
+        prev.filter((group) => group._id !== groupId)
+      );
+    } else {
+      toast.error(
+        response.message || "Failed to delete group"
+      );
+    }
+  } catch (error: any) {
+    console.error("Error deleting group:", error);
+
+    toast.error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete group"
+    );
+  }
+};
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -68,11 +101,13 @@ export default function GroupTable() {
             <TableCell>{group.totalUsers}</TableCell>
 
             <TableCell className="text-right space-x-2">
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline"
+              onClick={() => window.location.href = `/groups/${group._id}/edit`}>
                 Edit
               </Button>
 
-              <Button size="sm" variant="destructive">
+              <Button size="sm" variant="destructive"
+              onClick={() => deleteGroup(group._id)}>
                 Delete
               </Button>
             </TableCell>

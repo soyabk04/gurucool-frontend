@@ -70,12 +70,13 @@ export default function ChapterPage() {
       code: string;
       message: string;
     } | null>(null);
-   courseProgress
-  /**
+
+  /*
    * --------------------------------------------------
    * Fetch chapter + chapters + progress
    * --------------------------------------------------
    */
+
   useEffect(() => {
     const fetchData = async () => {
       if (!chapterId || !courseId) {
@@ -87,24 +88,19 @@ export default function ChapterPage() {
         setAccessError(null);
 
         /*
-         * --------------------------------------------------
-         * First request chapter.
-         *
-         * Backend performs:
-         * - enrollment check
-         * - chapter access-date check
-         * - expiration check
-         * - previous chapter check
-         * --------------------------------------------------
+         * Backend checks:
+         * - enrollment
+         * - chapter access date
+         * - expiration
+         * - previous chapter
          */
 
         const chapterData =
           await getChapter(chapterId);
 
         /*
-         * --------------------------------------------------
-         * Only fetch the rest if chapter access succeeds.
-         * --------------------------------------------------
+         * Only fetch the rest if chapter
+         * access succeeds.
          */
 
         const [
@@ -117,7 +113,7 @@ export default function ChapterPage() {
 
         /*
          * --------------------------------------------------
-         * Merge backend progress with chapters
+         * Merge progress with chapters
          * --------------------------------------------------
          */
 
@@ -136,9 +132,11 @@ export default function ChapterPage() {
 
               return {
                 ...item,
+
                 completed:
                   progress?.completed ??
                   false,
+
                 watchedDuration:
                   progress?.watchedDuration ??
                   0,
@@ -161,9 +159,11 @@ export default function ChapterPage() {
 
         setChapter({
           ...chapterData,
+
           completed:
             currentProgress?.completed ??
             false,
+
           watchedDuration:
             currentProgress?.watchedDuration ??
             0,
@@ -174,10 +174,8 @@ export default function ChapterPage() {
         );
 
         /*
-         * --------------------------------------------------
-         * Reset quiz state whenever user
+         * Reset quiz whenever user
          * navigates to another chapter.
-         * --------------------------------------------------
          */
 
         setQuizQuestions([]);
@@ -221,6 +219,7 @@ export default function ChapterPage() {
               code:
                 code ||
                 "CHAPTER_ACCESS_DENIED",
+
               message:
                 message ||
                 "You cannot access this chapter.",
@@ -246,11 +245,12 @@ export default function ChapterPage() {
     fetchData();
   }, [chapterId, courseId]);
 
-  /**
+  /*
    * --------------------------------------------------
    * Save watched duration
    * --------------------------------------------------
    */
+
   const handleProgress = async (
     watchedDuration: number
   ) => {
@@ -272,65 +272,20 @@ export default function ChapterPage() {
     }
   };
 
-  /**
+  /*
    * --------------------------------------------------
-   * Video ended
+   * Complete chapter
+   * --------------------------------------------------
    *
-   * IMPORTANT:
-   * We DO NOT complete the chapter here.
+   * This is called in two situations:
    *
-   * Instead, fetch the quiz and display it
-   * in the same location as the video.
+   * 1. Video ends and there is NO quiz.
+   *
+   * 2. Student passes the quiz.
+   *
    * --------------------------------------------------
    */
-  const handleVideoEnded =
-    async () => {
-      if (!chapterId) {
-        return;
-      }
 
-      try {
-        setQuizLoading(true);
-
-        const questions =
-          await getQuizQuestions(
-            chapterId
-          );
-
-        setQuizQuestions(
-          questions
-        );
-
-        setShowQuiz(true);
-      } catch (error) {
-        console.error(
-          "Failed to load chapter quiz:",
-          error
-        );
-
-        if (
-          axios.isAxiosError(error)
-        ) {
-          toast.error(
-            error.response?.data
-              ?.message ||
-              "Failed to load quiz"
-          );
-        } else {
-          toast.error(
-            "Failed to load quiz"
-          );
-        }
-      } finally {
-        setQuizLoading(false);
-      }
-    };
-
-  /**
-   * --------------------------------------------------
-   * Called ONLY after the student passes the quiz.
-   * --------------------------------------------------
-   */
   const handleChapterComplete =
     async () => {
       if (
@@ -341,10 +296,18 @@ export default function ChapterPage() {
         return;
       }
 
+      /*
+       * Don't send another completion request
+       * if the chapter is already completed.
+       */
+
+      if (chapter.completed) {
+        return;
+      }
+
       try {
         const watchedDuration =
-          chapter.watchedDuration ||
-          0;
+          chapter.watchedDuration || 0;
 
         const updated =
           await updateChapterProgress({
@@ -389,10 +352,6 @@ export default function ChapterPage() {
         /*
          * --------------------------------------------------
          * Update course progress
-         *
-         * We calculate the new completed count
-         * instead of blindly adding 1 because the
-         * chapter might already have been completed.
          * --------------------------------------------------
          */
 
@@ -401,14 +360,8 @@ export default function ChapterPage() {
             return prev;
           }
 
-          const wasAlreadyCompleted =
-            chapter.completed;
-
           const completedChapters =
-            wasAlreadyCompleted
-              ? prev.completedChapters
-              : prev.completedChapters +
-                1;
+            prev.completedChapters + 1;
 
           const totalChapters =
             prev.totalChapters ??
@@ -425,18 +378,34 @@ export default function ChapterPage() {
 
           return {
             ...prev,
+
             completedChapters,
+
             percentage,
+
             progress:
               updated.courseProgress ??
               prev.progress,
           };
         });
 
+        /*
+         * Hide quiz if completion happened
+         * after passing the quiz.
+         */
+
+        setShowQuiz(false);
+        setQuizQuestions([]);
+
         toast.success(
           "Chapter completed"
         );
       } catch (error) {
+        console.error(
+          "Failed to complete chapter:",
+          error
+        );
+
         if (
           axios.isAxiosError(error)
         ) {
@@ -453,7 +422,135 @@ export default function ChapterPage() {
       }
     };
 
-  /**
+  /*
+   * --------------------------------------------------
+   * Video ended
+   * --------------------------------------------------
+   *
+   * IMPORTANT:
+   *
+   * Video ending does NOT automatically mean
+   * completion when a quiz exists.
+   *
+   * We first check whether this chapter
+   * has a quiz.
+   *
+   * NO QUIZ:
+   *     Video ends
+   *          ↓
+   *     Complete chapter
+   *
+   * HAS QUIZ:
+   *     Video ends
+   *          ↓
+   *     Show quiz
+   *          ↓
+   *     Pass quiz
+   *          ↓
+   *     Complete chapter
+   *
+   * --------------------------------------------------
+   */
+
+  const handleVideoEnded =
+    async () => {
+      if (!chapterId) {
+        return;
+      }
+
+      /*
+       * Prevent multiple calls if the video
+       * fires ended more than once.
+       */
+
+      if (quizLoading || showQuiz) {
+        return;
+      }
+
+      try {
+        setQuizLoading(true);
+
+        const questions =
+          await getQuizQuestions(
+            chapterId
+          );
+
+        /*
+         * --------------------------------------------------
+         * NO QUIZ
+         * --------------------------------------------------
+         *
+         * If backend returns an empty array,
+         * this chapter has no quiz.
+         *
+         * Complete immediately.
+         */
+
+        if (
+          !questions ||
+          questions.length === 0
+        ) {
+          await handleChapterComplete();
+          return;
+        }
+
+        /*
+         * --------------------------------------------------
+         * QUIZ EXISTS
+         * --------------------------------------------------
+         *
+         * Don't complete the chapter yet.
+         *
+         * Show the quiz.
+         */
+
+        setQuizQuestions(
+          questions
+        );
+
+        setShowQuiz(true);
+      } catch (error) {
+        console.error(
+          "Failed to load chapter quiz:",
+          error
+        );
+
+        /*
+         * --------------------------------------------------
+         * 404 = No quiz configured
+         * --------------------------------------------------
+         *
+         * If your backend returns 404 when a chapter
+         * has no quiz, treat that as "no quiz".
+         */
+
+        if (
+          axios.isAxiosError(error)
+        ) {
+          const status =
+            error.response?.status;
+
+          if (status === 404) {
+            await handleChapterComplete();
+            return;
+          }
+
+          toast.error(
+            error.response?.data
+              ?.message ||
+              "Failed to load quiz"
+          );
+        } else {
+          toast.error(
+            "Failed to load quiz"
+          );
+        }
+      } finally {
+        setQuizLoading(false);
+      }
+    };
+
+  /*
    * --------------------------------------------------
    * Loading
    * --------------------------------------------------
@@ -469,7 +566,7 @@ export default function ChapterPage() {
     );
   }
 
-  /**
+  /*
    * --------------------------------------------------
    * Chapter access denied
    * --------------------------------------------------
@@ -511,6 +608,12 @@ export default function ChapterPage() {
       icon = "🔒";
     }
 
+    /*
+     * This shouldn't normally happen anymore
+     * because the backend allows access when
+     * access dates aren't configured.
+     */
+
     if (
       accessError.code ===
       "CHAPTER_ACCESS_NOT_CONFIGURED"
@@ -550,7 +653,7 @@ export default function ChapterPage() {
     );
   }
 
-  /**
+  /*
    * --------------------------------------------------
    * Chapter not found
    * --------------------------------------------------
@@ -568,7 +671,7 @@ export default function ChapterPage() {
 
   /*
    * --------------------------------------------------
-   * Find current chapter index
+   * Current chapter index
    * --------------------------------------------------
    */
 
@@ -577,6 +680,7 @@ export default function ChapterPage() {
       (item) =>
         item._id === chapterId
     );
+    courseProgress
 
   return (
     <main className="mx-auto w-full max-w-7xl p-6">
@@ -640,11 +744,11 @@ export default function ChapterPage() {
                 <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
 
                 <p className="text-sm font-medium">
-                  Loading quiz...
+                  Checking chapter quiz...
                 </p>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Get ready for the chapter quiz.
+                  Checking whether this chapter has a quiz.
                 </p>
               </div>
             </div>
@@ -685,7 +789,9 @@ export default function ChapterPage() {
                 className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                   chapter.completed
                     ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                    : "bg-muted text-muted-foreground"
+                    : showQuiz
+                      ? "bg-muted text-muted-foreground"
+                      : "bg-muted text-muted-foreground"
                 }`}
               >
                 {chapter.completed

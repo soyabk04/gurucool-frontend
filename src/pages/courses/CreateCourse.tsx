@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -6,7 +7,11 @@ import CourseForm from "@/components/course/CourseForm";
 import { createCourse } from "@/services/course.service";
 import type { CreateCourse } from "@/types/course";
 
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+
 import { Progress } from "@/components/ui/progress";
 
 export default function CreateCoursePage() {
@@ -16,33 +21,53 @@ export default function CreateCoursePage() {
 
   const navigate = useNavigate();
 
-  const handleCreate = async (data: CreateCourse) => {
+  const handleCreate = async (
+    data: CreateCourse
+  ) => {
     try {
       setLoading(true);
 
-      toast.loading("Creating course...", {
-        id: "create-course",
-      });
-
-      const course = await createCourse(data, (percent) => {
-        setUploading(true);
-        setProgress(percent);
-
-        toast.loading(`Uploading thumbnail... ${percent}%`, {
+      toast.loading(
+        "Creating course...",
+        {
           id: "create-course",
-        });
-      });
+        }
+      );
+
+      const course = await createCourse(
+        data,
+        (percent) => {
+          setUploading(true);
+          setProgress(percent);
+
+          toast.loading(
+            `Uploading course files... ${percent}%`,
+            {
+              id: "create-course",
+            }
+          );
+        }
+      );
 
       setUploading(false);
       setProgress(100);
 
-      toast.success("Course created successfully!", {
-        id: "create-course",
-      });
+      toast.success(
+        "Course created successfully!",
+        {
+          id: "create-course",
+        }
+      );
 
-      navigate(`/courses/${course._id}/edit`);
+      navigate(
+        `/courses/${course._id}/edit`
+      );
+
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Course creation failed:",
+        error
+      );
 
       setUploading(false);
 
@@ -54,6 +79,7 @@ export default function CreateCoursePage() {
           id: "create-course",
         }
       );
+
     } finally {
       setLoading(false);
     }
@@ -61,41 +87,61 @@ export default function CreateCoursePage() {
 
   return (
     <>
+      {/* Upload Progress */}
       {uploading && (
         <Card className="mb-4">
           <CardContent className="space-y-4 p-6">
+
             <div className="flex items-center justify-between">
+
               <div>
-                <h3 className="font-medium">Uploading Course</h3>
+                <h3 className="font-medium">
+                  Uploading Course Files
+                </h3>
+
                 <p className="text-sm text-muted-foreground">
+                  Uploading course thumbnail and certificate template.
                   Please don't close this page.
                 </p>
               </div>
 
-              <span className="font-semibold">{progress}%</span>
+              <span className="font-semibold">
+                {progress}%
+              </span>
+
             </div>
 
             <Progress value={progress} />
 
             <p className="text-xs text-muted-foreground">
               {progress === 100
-                ? "Finalizing upload..."
+                ? "Finalizing course..."
                 : `Uploaded ${progress}%`}
             </p>
+
           </CardContent>
         </Card>
       )}
 
+      {/* Course Form */}
       {!uploading && (
         <div className="container mx-auto space-y-6 py-2">
+
           <div>
-            <h1 className="text-3xl font-bold">Create Course</h1>
+            <h1 className="text-3xl font-bold">
+              Create Course
+            </h1>
+
             <p className="text-muted-foreground">
               Add a new course, then add chapters to it.
             </p>
           </div>
 
-          <CourseForm loading={loading} onSubmit={handleCreate} />
+          <CourseForm
+            loading={loading}
+            onSubmit={handleCreate}
+          />
+
         </div>
       )}
     </>

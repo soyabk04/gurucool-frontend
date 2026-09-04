@@ -19,7 +19,7 @@ import Courses from "@/pages/courses/Courses";
 import CreateCourse from "@/pages/courses/CreateCourse";
 import CourseDetails from "@/pages/courses/CourseDetails";
 import CourseEditor from "@/pages/courses/CourseEditor";
-
+import MyCertification from "@/pages/MyCertification";
 import AssignOrganizationCourse from "@/pages/superadmin/AssignOrganizationCourse";
 import AssignGroupCourse from "@/pages/admin/AssignOrganizationCourse";
 import AssignCoursePage from "@/pages/coordinator/AssignCoursePage";
@@ -28,6 +28,8 @@ import ChapterPage from "@/pages/ChapterPage";
 import ChangemyPasswordPage from "@/pages/changeMyPassword"
 import NotFound from "@/pages/NotFound";
 import CreateChapterPage from "@/pages/CreateChapterPage";
+import EditChapter from "@/pages/EditChapter";
+import UpdateGroup from "@/pages/CreateUpdateGroup";
 
 export default function AppRoutes() {
   return (
@@ -87,6 +89,13 @@ export default function AppRoutes() {
 
         
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/certifications" element={<MyCertification />} />
+        <Route path="/courses/:courseId/chapters/:chapterId/edit" element={<EditChapter />} />
+        <Route path="/organization/settings" element={<OrganizationSettingsPage />} />
+        <Route
+  path="/groups/:groupId/edit"
+  element={<UpdateGroup />}
+/>
         <Route path="/orgsetting" element={<OrganizationSettingsPage />} />
         <Route
           path="/courses/:courseId/chapters/create"

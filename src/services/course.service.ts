@@ -5,33 +5,52 @@ export const createCourse = async (
   form: CreateCourse,
   onProgress?: (progress: number) => void
 ): Promise<Course> => {
-const formData = new FormData();
+  const formData = new FormData();
 
-formData.append(
-  "course",
-  JSON.stringify({
-    title: form.title,
-    description: form.description,
-  })
-);
+  // Course data
+  formData.append(
+    "course",
+    JSON.stringify({
+      title: form.title,
+      description: form.description,
+    })
+  );
 
-if (form.thumbnail) {
-  formData.append("thumbnail", form.thumbnail);
-}
+  // Course thumbnail
+  if (form.thumbnail) {
+    formData.append(
+      "thumbnail",
+      form.thumbnail
+    );
+  }
 
-const response = await api.post("/courses", formData, {
-  headers: {
-    "Content-Type": "multipart/form-data",
-  },
-  onUploadProgress: (event) => {
-    if (event.total && onProgress) {
-      const percent = Math.round(
-        (event.loaded * 100) / event.total
-      );
-      onProgress(percent);
+  // Certificate template
+  if (form.certTemplate) {
+    formData.append(
+      "certTemplate",
+      form.certTemplate
+    );
+  }
+
+  const response = await api.post(
+    "/courses",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+
+      onUploadProgress: (event) => {
+        if (event.total && onProgress) {
+          const percent = Math.round(
+            (event.loaded * 100) / event.total
+          );
+
+          onProgress(percent);
+        }
+      },
     }
-  },
-});
+  );
 
   return response.data.course.course;
 };
@@ -56,6 +75,13 @@ export const getMyCourses = async () => {
   const res = await api.get("/courses/cour");
   return res.data;
 };
+
+export const getMyCertificates = async () => {
+  const res = await api.get("/courses/mycertificates");
+  return res.data.data;
+};
+
+
 
 
 export interface ChapterProgress {
@@ -118,3 +144,4 @@ export const updateChapterProgress = async ({
   console.log(response)
   return response.data.data;
 };
+

@@ -117,7 +117,7 @@ export function UserMenu() {
               </div>
 
               <Badge
-                variant="secondary"
+                variant="outline"
                 className="capitalize"
               >
                 {user.role}

@@ -93,6 +93,16 @@ export const navigation: NavigationGroup[] = [
           "user",
         ],
       },
+            {
+        title: "Certifications",
+        href: "/certifications",
+        icon: GraduationCap,
+        roles: [
+          "coordinator",
+          "user",
+        ],
+      },
+
 
       {
         title: "Assign Organization",
@@ -134,11 +144,10 @@ export const navigation: NavigationGroup[] = [
       },
       {
         title: "Settings",
-        href: "/settings",
+        href: "/organization/settings",
         icon: Settings,
         roles: [
-          "superadmin",
-          "admin",
+          "admin"
         ],
       },
 

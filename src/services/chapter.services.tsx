@@ -54,11 +54,69 @@ export const getChapters = async (
   const response = await api.get(
     `/courses/course/${courseId}`
   );
-
+  console.log("Fetched chapters response:", response.data);
   return response.data.chapters;
 };
+export const editChapter = async (
+  chapterId: string,
+  chapterData: Partial<Chapter>,
+  quizData?: Record<string, unknown>,
+  video?: File,
+  onProgress?: (progress: number) => void
+) => {
+  const formData = new FormData();
 
+  formData.append(
+    "chapter",
+    JSON.stringify(chapterData)
+  );
 
+  if (quizData) {
+    formData.append(
+      "quiz",
+      JSON.stringify(quizData)
+    );
+  }
+
+  if (video) {
+    formData.append(
+      "video",
+      video
+    );
+  }
+
+  const response = await api.patch(
+    `/courses/chapter/update/${chapterId}`,
+    formData,
+    {
+      onUploadProgress: (event) => {
+        if (
+          onProgress &&
+          event.total
+        ) {
+          const progress = Math.round(
+            (event.loaded /
+              event.total) *
+              100
+          );
+
+          onProgress(progress);
+        }
+      },
+    }
+  );
+
+  return response.data;
+};
+export const deleteChapter = async (
+  chapterId: string
+) => {
+  const response = await api.delete(
+    `/courses/chapters/${chapterId}`
+  );
+
+  return response.data;
+};
 
 export const getChapter = async (
   chapterId: string

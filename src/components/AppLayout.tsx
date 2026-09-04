@@ -84,7 +84,7 @@ export default function AppLayout() {
 
           {user && (
             <div className="flex items-center gap-2.5 pl-2">
-              <Badge variant="secondary" className="hidden capitalize sm:inline-flex">
+              <Badge variant="default" className="hidden capitalize sm:inline-flex">
                 {user.role}
               </Badge>
               <Avatar size="sm">
