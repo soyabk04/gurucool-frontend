@@ -30,6 +30,7 @@ import NotFound from "@/pages/NotFound";
 import CreateChapterPage from "@/pages/CreateChapterPage";
 import EditChapter from "@/pages/EditChapter";
 import UpdateGroup from "@/pages/CreateUpdateGroup";
+import UserProgress from "@/pages/UserProgress";
 
 export default function AppRoutes() {
   return (
@@ -92,6 +93,7 @@ export default function AppRoutes() {
         <Route path="/certifications" element={<MyCertification />} />
         <Route path="/courses/:courseId/chapters/:chapterId/edit" element={<EditChapter />} />
         <Route path="/organization/settings" element={<OrganizationSettingsPage />} />
+        <Route path="/course/progress/user/" element={<UserProgress />} />
         <Route
   path="/groups/:groupId/edit"
   element={<UpdateGroup />}

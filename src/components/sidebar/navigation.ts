@@ -143,6 +143,14 @@ export const navigation: NavigationGroup[] = [
         ],
       },
       {
+        title: "Users progress",
+        href: "/course/progress/user/",
+        icon: Settings,
+        roles: [
+          "coordinator"
+        ],
+      },
+      {
         title: "Settings",
         href: "/organization/settings",
         icon: Settings,

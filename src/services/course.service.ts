@@ -1,5 +1,9 @@
-import {api} from "@/api/axios";
+import { api } from "@/api/axios";
 import type { Course, CreateCourse } from "@/types/course";
+
+/* =========================================================
+   CREATE COURSE
+========================================================= */
 
 export const createCourse = async (
   form: CreateCourse,
@@ -7,33 +11,18 @@ export const createCourse = async (
 ): Promise<Course> => {
   const formData = new FormData();
 
-  // Course data
-  formData.append(
-    "course",
-    JSON.stringify({
-      title: form.title,
-      description: form.description,
-    })
-  );
-
-  // Course thumbnail
-  if (form.thumbnail) {
-    formData.append(
-      "thumbnail",
-      form.thumbnail
-    );
-  }
-
-  // Certificate template
-  if (form.certTemplate) {
-    formData.append(
-      "certTemplate",
-      form.certTemplate
-    );
-  }
+  Object.entries(form).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (value instanceof File) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, String(value));
+      }
+    }
+  });
 
   const response = await api.post(
-    "/courses",
+    "/courses/create",
     formData,
     {
       headers: {
@@ -42,47 +31,96 @@ export const createCourse = async (
 
       onUploadProgress: (event) => {
         if (event.total && onProgress) {
-          const percent = Math.round(
+          const progress = Math.round(
             (event.loaded * 100) / event.total
           );
 
-          onProgress(percent);
+          onProgress(progress);
         }
       },
     }
   );
 
-  return response.data.course.course;
+  return response.data.data;
 };
-// Full course list — superadmin/admin only (matches GET /courses/cour on the backend).
-export const getCourses = async (organizationId?: string) => {
-  if (!organizationId) {
-    const res = await api.get("/courses/cour");
-    console.log(res.data)
-    return res.data;
-  } else {
-    const res = await api.get(`/courses/cour/?organizationId=${organizationId}`);
-    return res.data;
-  }
 
+/* =========================================================
+   COORDINATOR COURSE
+========================================================= */
+
+export interface CoordinatorCourse {
+  _id: string;
+
+  groupId: {
+    _id: string;
+    name: string;
+    organization: string;
+    groupCode: string;
+    coordinator: string;
+  };
+
+  courseId: {
+    _id: string;
+    title: string;
+    description: string;
+    instructor: string;
+    createdAt: string;
+    updatedAt: string;
+    thumbnail?: string;
+  };
+}
+
+/* =========================================================
+   GET COORDINATOR COURSES
+========================================================= */
+
+export const getCourses = async (): Promise<
+  CoordinatorCourse[]
+> => {
+  const response = await api.get("/courses/cour");
+
+  return response.data.data ?? [];
 };
+
+/* =========================================================
+   ORGANIZATION COURSES
+========================================================= */
+
 export const getOrgCourses = async () => {
-  const res = await api.get("/courses/orgcourses");
-  return res.data;
+  const response = await api.get(
+    "/courses/orgcourses"
+  );
+
+  return response.data;
 };
-// Courses the current user has access to (any role) — matches GET /courses/mycourses.
+
+/* =========================================================
+   MY COURSES
+========================================================= */
+
 export const getMyCourses = async () => {
-  const res = await api.get("/courses/cour");
-  return res.data;
+  const response = await api.get(
+    "/courses/cour"
+  );
+
+  return response.data;
 };
+
+/* =========================================================
+   CERTIFICATES
+========================================================= */
 
 export const getMyCertificates = async () => {
-  const res = await api.get("/courses/mycertificates");
-  return res.data.data;
+  const response = await api.get(
+    "/courses/mycertificates"
+  );
+
+  return response.data.data;
 };
 
-
-
+/* =========================================================
+   CHAPTER PROGRESS
+========================================================= */
 
 export interface ChapterProgress {
   _id: string;
@@ -102,46 +140,75 @@ export interface CourseProgress {
   chapters: ChapterProgress[];
 }
 
-interface UpdateChapterProgressData {
+export interface UpdateChapterProgressData {
   courseId: string;
   chapterId: string;
   watchedDuration: number;
   completed?: boolean;
 }
 
-/**
- * Get the current user's progress for a course.
- */
 export const getCourseProgress = async (
   courseId: string
 ): Promise<CourseProgress> => {
-  const { data } = await api.get(
+  const response = await api.get(
     `/courses/progress/${courseId}`
   );
 
-  return data.data;
-};
-
-/**
- * Update watched duration / completion for a chapter.
- *
- * If the progress document doesn't exist on the backend,
- * the backend creates it using upsert.
- */
-export const updateChapterProgress = async ({
-  courseId,
-  chapterId,
-  watchedDuration,
-  completed = false,
-}: UpdateChapterProgressData) => {
-  const response = await api.patch(
-    `/courses/${courseId}/chapters/${chapterId}/progress`,
-    {
-      watchedDuration,
-      completed,
-    }
-  );
-  console.log(response)
   return response.data.data;
 };
 
+export const updateChapterProgress = async (
+  courseId: string,
+  chapterId: string,
+  data: {
+    watchedDuration: number;
+    completed?: boolean;
+  }
+) => {
+  const response = await api.patch(
+    `/courses/${courseId}/chapters/${chapterId}/progress`,
+    data
+  );
+
+  return response.data.data;
+};
+
+/* =========================================================
+   COORDINATOR USER PROGRESS
+========================================================= */
+
+export interface CoordinatorUserProgress {
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+
+  progress: number;
+
+  completedChapters: number;
+
+  totalChapters: number;
+
+  lastActivity: string | null;
+
+  status:
+    | "completed"
+    | "in-progress"
+    | "not-started";
+}
+
+/* =========================================================
+   GET USER PROGRESS FOR SELECTED COURSE
+========================================================= */
+
+export const getCoordinatorUserProgress =
+  async (
+    courseId: string
+  ): Promise<CoordinatorUserProgress[]> => {
+    const response = await api.get(
+      `/courses/coordinator/courses/${courseId}/progress`
+    );
+
+    return response.data.data ?? [];
+  };
