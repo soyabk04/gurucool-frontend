@@ -74,13 +74,19 @@ export interface CoordinatorCourse {
    GET COORDINATOR COURSES
 ========================================================= */
 
-export const getCourses = async (): Promise<
-  CoordinatorCourse[]
-> => {
+export const getCourses = async (organizationId?: string) => {
+  if (organizationId) {
+    const response = await api.get(
+      `/courses/cour/?organizationId=${organizationId}`
+    );
+
+    return response.data ?? [];
+  }
+
   const response = await api.get("/courses/cour");
 
-  return response.data.data ?? [];
-};
+  return response.data ?? [];
+}
 
 /* =========================================================
    ORGANIZATION COURSES
@@ -149,7 +155,7 @@ export interface UpdateChapterProgressData {
 
 export const getCourseProgress = async (
   courseId: string
-): Promise<CourseProgress> => {
+) => {
   const response = await api.get(
     `/courses/progress/${courseId}`
   );
@@ -205,7 +211,7 @@ export interface CoordinatorUserProgress {
 export const getCoordinatorUserProgress =
   async (
     courseId: string
-  ): Promise<CoordinatorUserProgress[]> => {
+  ) => {
     const response = await api.get(
       `/courses/coordinator/courses/${courseId}/progress`
     );

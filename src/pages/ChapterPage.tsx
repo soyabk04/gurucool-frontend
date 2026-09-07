@@ -23,6 +23,7 @@ import type {
 import {
   getCourseProgress,
   updateChapterProgress,
+  type ChapterProgress,
   type CourseProgress,
 } from "@/services/course.service";
 
@@ -117,8 +118,8 @@ export default function ChapterPage() {
          * --------------------------------------------------
          */
 
-        const progressMap = new Map(
-          progressData.chapters.map((item) => [
+        const progressMap = new Map<string, ChapterProgress>(
+          progressData.chapters.map((item: ChapterProgress) => [
             item._id,
             item,
           ])
@@ -127,7 +128,7 @@ export default function ChapterPage() {
         const chaptersWithProgress =
           chaptersData.map(
             (item: Chapter) => {
-              const progress =
+              const progress: ChapterProgress | undefined =
                 progressMap.get(item._id);
 
               return {
@@ -259,11 +260,13 @@ export default function ChapterPage() {
     }
 
     try {
-      await updateChapterProgress({
+      await updateChapterProgress(
         courseId,
         chapterId,
-        watchedDuration,
-      });
+        {
+          watchedDuration,
+        }
+      );
     } catch (error) {
       console.error(
         "Failed to save video progress:",
@@ -310,12 +313,14 @@ export default function ChapterPage() {
           chapter.watchedDuration || 0;
 
         const updated =
-          await updateChapterProgress({
+          await updateChapterProgress(
             courseId,
             chapterId,
-            watchedDuration,
-            completed: true,
-          });
+            {
+              watchedDuration,
+              completed: true,
+            }
+          );
 
         /*
          * --------------------------------------------------

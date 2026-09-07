@@ -20,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { useTheme } from "@/context/ThemeContext";
 
 import {
-  getCourses,
   getCoordinatorUserProgress,
   type CoordinatorUserProgress,
 } from "@/services/course.service";
