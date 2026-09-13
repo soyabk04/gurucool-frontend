@@ -60,8 +60,8 @@ export default function UserEntryForm({ onAdd }: Props) {
     return (
       form.name.trim() !== "" &&
       form.email.trim() !== "" &&
-      form.ID.trim() !== "" &&
-      form.groupCode.trim() !== ""
+      form.ID.trim() !== "" 
+      // form.groupCode.trim() !== ""
     );
   }, [form]);
 

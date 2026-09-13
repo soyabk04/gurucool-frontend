@@ -14,8 +14,12 @@ console.log(response.data)
   return response.data.data;
 }
 
-export async function getUserDashboard(): Promise<DashboardResponse> {
+export async function getUserDashboard(userId?:string): Promise<DashboardResponse> {
+  if(userId){
+    const response = await api.get(`/analytics/user/dashboard/${userId}`);
+    return response.data.data
+  }
   const response = await api.get("/analytics/user/dashboard");
-console.log(response.data)
+
   return response.data.data;
 }

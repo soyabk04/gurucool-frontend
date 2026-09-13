@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { useAuth } from "@/context/AuthContext";
 import {
   BookOpen,
   ChevronRight,
@@ -14,6 +14,8 @@ import {
 
 import { getChapters } from "@/services/chapter.services";
 import type { Chapter } from "@/types/course";
+import { deleteCourse } from "@/services/course.service";
+import { toast } from "sonner";
 
 type ChapterAccessStatus =
   | "available"
@@ -34,7 +36,7 @@ interface ChapterWithAccess extends Chapter {
 export default function CourseDetails() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-
+  const { user } = useAuth()
   const [chapters, setChapters] = useState<
     ChapterWithAccess[]
   >([]);
@@ -62,7 +64,7 @@ export default function CourseDetails() {
       } catch (err: any) {
         setError(
           err?.response?.data?.message ??
-            "Failed to load course."
+          "Failed to load course."
         );
       } finally {
         setLoading(false);
@@ -115,7 +117,20 @@ export default function CourseDetails() {
       `/courses/${courseId}/chapter/${chapter._id}`
     );
   };
+  const handleEdit = () => {
+    navigate(`/courses/${courseId}/edit`)
+  }
+  const handleDelete = async (courseId: string) => {
+    try {
+      const res = await deleteCourse(courseId);
+      res
+      toast.success('Course deleted successfully')
+      navigate('/courses')
+    } catch (error) {
+      toast.error('failed to delete course')
+    }
 
+  }
   /*
    * --------------------------------------------------
    * Keyboard navigation
@@ -155,15 +170,15 @@ export default function CourseDetails() {
       case "upcoming":
         return chapter.access?.accessDate
           ? `Available from ${formatDate(
-              chapter.access.accessDate
-            )}`
+            chapter.access.accessDate
+          )}`
           : "Not available yet";
 
       case "expired":
         return chapter.access?.lastDate
           ? `Expired on ${formatDate(
-              chapter.access.lastDate
-            )}`
+            chapter.access.lastDate
+          )}`
           : "Access expired";
 
       case "locked":
@@ -213,21 +228,34 @@ export default function CourseDetails() {
             </p>
           </div>
 
-          {!loading && !error && (
+          <div className="flex items-center gap-1">
             <div className="rounded-lg border bg-muted/40 px-3 py-2 text-sm">
-
-              <span className="font-medium">
-                {chapters.length}
-              </span>{" "}
-
+              <span className="font-medium">{chapters.length}</span>{" "}
               <span className="text-muted-foreground">
-                {chapters.length === 1
-                  ? "chapter"
-                  : "chapters"}
+                {chapters.length === 1 ? "chapter" : "chapters"}
               </span>
-
             </div>
-          )}
+            {(["admin", "superadmin"].includes(user?.role ?? "")) && (
+              <>
+                <button
+                  type="button"
+                  className="rounded-lg border bg-muted/40 px-3 py-2 text-sm hover:bg-muted"
+                  onClick={handleEdit}
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  className="rounded-lg border bg-muted/40 px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
+                  onClick={() => courseId && handleDelete(courseId)}
+                >
+                  Delete
+                </button>
+              </>
+            )}
+
+          </div>
 
         </div>
       </div>
@@ -368,9 +396,8 @@ export default function CourseDetails() {
                       px-5 py-4
                       transition-colors
 
-                      ${
-                        isAvailable
-                          ? `
+                      ${isAvailable
+                        ? `
                             cursor-pointer
                             hover:bg-muted/40
                             focus-visible:outline-none
@@ -378,7 +405,7 @@ export default function CourseDetails() {
                             focus-visible:ring-primary
                             focus-visible:ring-inset
                           `
-                          : `
+                        : `
                             cursor-not-allowed
                             opacity-60
                           `
@@ -397,12 +424,11 @@ export default function CourseDetails() {
                         rounded-xl
                         text-sm font-semibold
 
-                        ${
-                          isCompleted
-                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                            : isAvailable
-                              ? "bg-primary/10 text-primary"
-                              : "bg-muted text-muted-foreground"
+                        ${isCompleted
+                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                          : isAvailable
+                            ? "bg-primary/10 text-primary"
+                            : "bg-muted text-muted-foreground"
                         }
                       `}
                     >
@@ -418,7 +444,7 @@ export default function CourseDetails() {
                       ) : status ===
                         "locked" ||
                         status ===
-                          "not_configured" ? (
+                        "not_configured" ? (
                         <Lock className="h-4 w-4" />
                       ) : (
                         String(
@@ -440,10 +466,9 @@ export default function CourseDetails() {
                         bg-background
                         text-muted-foreground
 
-                        ${
-                          isAvailable
-                            ? "group-hover:text-primary"
-                            : ""
+                        ${isAvailable
+                          ? "group-hover:text-primary"
+                          : ""
                         }
                       `}
                     >
@@ -465,10 +490,9 @@ export default function CourseDetails() {
                       <h3
                         className={`
                           truncate text-sm font-medium
-                          ${
-                            isAvailable
-                              ? "group-hover:text-primary"
-                              : "text-muted-foreground"
+                          ${isAvailable
+                            ? "group-hover:text-primary"
+                            : "text-muted-foreground"
                           }
                         `}
                       >
@@ -489,11 +513,10 @@ export default function CourseDetails() {
                           className={`
                             text-xs
 
-                            ${
-                              status ===
+                            ${status ===
                               "available"
-                                ? "text-green-600 dark:text-green-400"
-                                : "text-muted-foreground"
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-muted-foreground"
                             }
                           `}
                         >

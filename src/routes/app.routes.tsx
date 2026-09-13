@@ -31,6 +31,7 @@ import CreateChapterPage from "@/pages/CreateChapterPage";
 import EditChapter from "@/pages/EditChapter";
 import UpdateGroup from "@/pages/CreateUpdateGroup";
 import UserProgress from "@/pages/UserProgress";
+import GroupProgress from "@/pages/groupCourseProgressPage";
 
 export default function AppRoutes() {
   return (
@@ -94,6 +95,8 @@ export default function AppRoutes() {
         <Route path="/courses/:courseId/chapters/:chapterId/edit" element={<EditChapter />} />
         <Route path="/organization/settings" element={<OrganizationSettingsPage />} />
         <Route path="/course/progress/user/" element={<UserProgress />} />
+        <Route path="/course/progress/group/" element={<GroupProgress/>} />
+
         <Route
   path="/groups/:groupId/edit"
   element={<UpdateGroup />}

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { deleteCourse } from "@/services/course.service";
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +22,7 @@ export default function CourseEditor() {
   const { courseId } = useParams<{
     courseId: string;
   }>();
+  const { user } = useAuth()
 
   const navigate = useNavigate();
 
@@ -31,13 +35,26 @@ export default function CourseEditor() {
     }
   }, [courseId]);
 
+
+  const handleDelete = async (courseId: string) => {
+    try {
+      const res = await deleteCourse(courseId);
+      res
+      toast.success('Course deleted successfully')
+      window.location.replace('/courses')
+    } catch (error) {
+      toast.error('failed to delete course')
+    }
+
+  }
+
   const fetchChapters = async () => {
     if (!courseId) return;
 
     try {
       const data =
         await getChapters(courseId);
-        console.log("Fetched chapters:", data);
+      console.log("Fetched chapters:", data);
       setChapters(data);
     } catch (error) {
       console.error(
@@ -69,9 +86,7 @@ export default function CourseEditor() {
     <div className="mx-auto max-w-5xl space-y-6 p-6">
 
       {/* Header */}
-
       <div className="flex items-center justify-between">
-
         <div>
           <h1 className="text-3xl font-bold">
             Course Editor
@@ -82,12 +97,21 @@ export default function CourseEditor() {
           </p>
         </div>
 
-        <Button
-          onClick={handleAddChapter}
-        >
-          Add Chapter
-        </Button>
+        <div className="flex items-center gap-2">
+          {(["admin", "superadmin"].includes(user?.role ?? "")) && (
+            <button
+              type="button"
+              className="rounded-lg border bg-muted/40 px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
+              onClick={() => courseId && handleDelete(courseId)}
+            >
+              Delete
+            </button>
+          )}
 
+          <Button onClick={handleAddChapter}>
+            Add Chapter
+          </Button>
+        </div>
       </div>
 
       {/* Chapter List */}

@@ -45,7 +45,7 @@ export function useUserDashboard() {
   return useQuery<any>({
     queryKey: ["user-dashboard"],
 
-    queryFn: getUserDashboard,
+    queryFn: () => getUserDashboard(),
 
     staleTime: 1000 * 60 * 5,
 

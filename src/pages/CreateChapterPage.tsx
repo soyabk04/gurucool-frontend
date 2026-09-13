@@ -15,7 +15,7 @@ import { createChapter } from "@/services/chapter.services";
 export default function CreateChapterPage() {
   const navigate = useNavigate();
   const { courseId } = useParams<{ courseId: string }>();
-
+  console.log(courseId)
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -30,7 +30,7 @@ export default function CreateChapterPage() {
       setLoading(true);
       setUploading(true);
       setProgress(0);
-
+      
       await createChapter(courseId, data, (percent) => {
         setProgress(percent);
       });

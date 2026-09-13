@@ -19,7 +19,7 @@ export default function Courses() {
   const [error, setError] = useState<string | null>(null);
 
   const canManageCourses = user?.role === "superadmin" || user?.role === "admin";
-
+  console.log(user)
   useEffect(() => {
     if (!user) return;
 

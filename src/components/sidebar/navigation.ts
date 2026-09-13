@@ -150,6 +150,14 @@ export const navigation: NavigationGroup[] = [
           "coordinator"
         ],
       },
+            {
+        title: "Groups progress",
+        href: "/course/progress/group/",
+        icon: Settings,
+        roles: [
+          "admin"
+        ],
+      },
       {
         title: "Settings",
         href: "/organization/settings",

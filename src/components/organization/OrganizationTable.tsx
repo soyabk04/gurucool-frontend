@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "@/components/ui/button";
-import { getOrg } from "@/services/organization.service";
+import { getOrg, deleteOrganization } from "@/services/organization.service";
+import { toast } from "sonner";
 
 interface Organization {
   _id: string;
@@ -45,6 +46,23 @@ export default function OrganizationTable() {
   if (loading) {
     return <p>Loading organizations...</p>;
   }
+const handleDeleteOrganization = async (organizationId: string) => {
+  try {
+    await deleteOrganization(organizationId);
+
+    const index = organizations.findIndex(
+      item => item._id === organizationId
+    );
+
+    if (index !== -1) {
+      organizations.splice(index, 1);
+    }
+
+    toast.success("Organization deleted successfully");
+  } catch (error: any) {
+    toast.error(error?.message || "Failed to delete organization");
+  }
+};
 
   return (
     <Table>
@@ -76,7 +94,7 @@ export default function OrganizationTable() {
                 View
               </Button>
 
-              <Button size="sm" variant="destructive">
+              <Button size="sm" variant="destructive" onClick={()=>{handleDeleteOrganization(org._id)}}>
                 Delete
               </Button>
             </TableCell>

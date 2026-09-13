@@ -90,7 +90,7 @@ export default function GroupCourseTable() {
               assignments.map((assignment) => (
                 <TableRow key={assignment._id}>
                   <TableCell>
-                    {assignment.groupId.name}
+                    {assignment.groupId?.name ?? "unknown"}
                   </TableCell>
 
                   <TableCell>

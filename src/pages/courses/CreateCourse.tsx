@@ -48,7 +48,7 @@ export default function CreateCoursePage() {
           );
         }
       );
-
+      console.log('course:',course)
       setUploading(false);
       setProgress(100);
 
@@ -58,15 +58,15 @@ export default function CreateCoursePage() {
           id: "create-course",
         }
       );
-
+      
       navigate(
         `/courses/${course._id}/edit`
       );
 
-    } catch (error) {
+    } catch (error:any) {
       console.error(
         "Course creation failed:",
-        error
+        
       );
 
       setUploading(false);

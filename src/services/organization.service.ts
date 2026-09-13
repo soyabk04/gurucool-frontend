@@ -77,3 +77,8 @@ export const getOrgById = async (id: string) => {
   const response = await api.get(`/organization/details/${id}`);
   return response.data.data;
 };
+
+export const deleteOrganization =async (organizationId:string)=>{
+  const response=await api.delete(`/organization/delete/${organizationId}`)
+  return response.data
+}

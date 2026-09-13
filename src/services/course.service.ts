@@ -11,37 +11,52 @@ export const createCourse = async (
 ): Promise<Course> => {
   const formData = new FormData();
 
-  Object.entries(form).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      if (value instanceof File) {
-        formData.append(key, value);
-      } else {
-        formData.append(key, String(value));
-      }
-    }
-  });
+  // Separate files from course data
+  const {
+    thumbnail,
+    certTemplate,
+    ...courseData
+  } = form;
+
+  // Course fields must be sent as JSON
+  formData.append("course", JSON.stringify(courseData));
+
+  // Files must use the exact Multer field names
+  if (thumbnail instanceof File) {
+    formData.append("thumbnail", thumbnail);
+  }
+
+  if (certTemplate instanceof File) {
+    formData.append("certTemplate", certTemplate);
+  }
+
+  // Debug — temporarily keep this
+  for (const [key, value] of formData.entries()) {
+    console.log(
+      key,
+      value instanceof File
+        ? `FILE: ${value.name}`
+        : value
+    );
+  }
 
   const response = await api.post(
     "/courses/create",
     formData,
     {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-
       onUploadProgress: (event) => {
         if (event.total && onProgress) {
-          const progress = Math.round(
-            (event.loaded * 100) / event.total
+          onProgress(
+            Math.round(
+              (event.loaded * 100) / event.total
+            )
           );
-
-          onProgress(progress);
         }
       },
     }
   );
-
-  return response.data.data;
+  return response.data.course.course;
+  
 };
 
 /* =========================================================
@@ -218,3 +233,19 @@ export const getCoordinatorUserProgress =
 
     return response.data.data ?? [];
   };
+
+export const getAdminGroupProgress = async (
+  courseId: string
+) => {
+  const response = await api.get(
+    `/courses/${courseId}/groups/progress`
+  );
+
+  return response.data.data ?? [];
+};
+
+  export const deleteCourse=async (courseId:string)=>{
+     const response=await api.delete(`/courses/delete/${courseId}`)
+     return response
+  }
+
