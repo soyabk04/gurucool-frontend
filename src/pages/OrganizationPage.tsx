@@ -5,11 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+        import { Button } from "@/components/ui/button";
+  import { useNavigate } from "react-router-dom";
+
 
 import OrganizationTable from "@/components/organization/OrganizationTable";
-import CreateOrganizationDialog from "@/components/organization/CreateOrganizationDialog";
+// import CreateOrganizationDialog from "@/components/organization/CreateOrganizationDialog";
 
 export default function OrganizationPage() {
+   const navigate = useNavigate();
   return (
     <div className="container mx-auto space-y-6 py-8">
       <div className="flex items-center justify-between">
@@ -19,8 +23,9 @@ export default function OrganizationPage() {
             Manage organizations in your platform.
           </p>
         </div>
-
-        <CreateOrganizationDialog />
+        <Button onClick={()=>{navigate('/organization/create')}}>
+          Create Organization
+        </Button>
       </div>
 
       <Card>

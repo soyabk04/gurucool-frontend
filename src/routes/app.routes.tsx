@@ -32,6 +32,7 @@ import EditChapter from "@/pages/EditChapter";
 import UpdateGroup from "@/pages/CreateUpdateGroup";
 import UserProgress from "@/pages/UserProgress";
 import GroupProgress from "@/pages/groupCourseProgressPage";
+import CreateOrganization from "@/components/organization/CreateOrganizationForm";
 
 export default function AppRoutes() {
   return (
@@ -96,6 +97,7 @@ export default function AppRoutes() {
         <Route path="/organization/settings" element={<OrganizationSettingsPage />} />
         <Route path="/course/progress/user/" element={<UserProgress />} />
         <Route path="/course/progress/group/" element={<GroupProgress/>} />
+        <Route path="/organization/create" element={<CreateOrganization/>} />
 
         <Route
   path="/groups/:groupId/edit"
