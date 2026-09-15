@@ -137,7 +137,7 @@ export default function AssignOrganizationForm() {
                             {courses.map((course) => (
                                 
                                 <SelectItem key={course._id} value={course._id}>
-                                    {course.title}
+                                    {course.title??'unkown'}
                                 </SelectItem>
                             ))}
                         </SelectContent>

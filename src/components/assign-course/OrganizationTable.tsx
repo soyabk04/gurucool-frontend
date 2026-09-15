@@ -95,7 +95,7 @@ export default function OrganizationCourseTable() {
                   </TableCell>
 
                   <TableCell>
-                    {assignment.courseId.title}
+                    {assignment.courseId?.title??'unkown'}
                   </TableCell>
 
                   <TableCell>
