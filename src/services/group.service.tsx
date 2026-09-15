@@ -81,6 +81,7 @@ export const updateGroup = async (
 
 export const createGroup = async (data:any) => {
   const response = await api.post("/organization/group",data);
-  return response.data.data;
+  // console.log(response)
+  return response.data;
 };
 

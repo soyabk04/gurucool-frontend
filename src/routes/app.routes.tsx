@@ -33,6 +33,7 @@ import UpdateGroup from "@/pages/CreateUpdateGroup";
 import UserProgress from "@/pages/UserProgress";
 import GroupProgress from "@/pages/groupCourseProgressPage";
 import CreateOrganization from "@/components/organization/CreateOrganizationForm";
+import CreateGroup from "@/components/group/CreateGroupForm";
 
 export default function AppRoutes() {
   return (
@@ -86,23 +87,25 @@ export default function AppRoutes() {
         }
       >
         <Route
-  path="/change-mypassword"
-  element={<ChangemyPasswordPage/>}
-/>
+          path="/change-mypassword"
+          element={<ChangemyPasswordPage />}
+        />
 
-        
+
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/certifications" element={<MyCertification />} />
         <Route path="/courses/:courseId/chapters/:chapterId/edit" element={<EditChapter />} />
         <Route path="/organization/settings" element={<OrganizationSettingsPage />} />
         <Route path="/course/progress/user/" element={<UserProgress />} />
-        <Route path="/course/progress/group/" element={<GroupProgress/>} />
-        <Route path="/organization/create" element={<CreateOrganization/>} />
+        <Route path="/course/progress/group/" element={<GroupProgress />} />
+        <Route path="/organization/create" element={<CreateOrganization />} />
+        <Route path="/group/create" element={<CreateGroup />} />
+
 
         <Route
-  path="/groups/:groupId/edit"
-  element={<UpdateGroup />}
-/>
+          path="/groups/:groupId/edit"
+          element={<UpdateGroup />}
+        />
         <Route path="/orgsetting" element={<OrganizationSettingsPage />} />
         <Route
           path="/courses/:courseId/chapters/create"
