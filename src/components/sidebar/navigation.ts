@@ -72,7 +72,6 @@ export const navigation: NavigationGroup[] = [
         icon: UsersRound,
         roles: [
           "admin",
-          "coordinator",
         ],
       },
     ],
