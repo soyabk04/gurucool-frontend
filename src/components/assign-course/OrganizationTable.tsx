@@ -91,7 +91,7 @@ export default function OrganizationCourseTable() {
               assignments.map((assignment) => (
                 <TableRow key={assignment._id}>
                   <TableCell>
-                    {assignment.organizationId.name}
+                    {assignment?.organizationId?.name??'unknown'}
                   </TableCell>
 
                   <TableCell>
