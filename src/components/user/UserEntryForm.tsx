@@ -17,7 +17,6 @@ export type UserRole = "user" | "coordinator" | "admin";
 export interface PendingUser {
   name: string;
   email: string;
-  ID: string;
   role: UserRole;
   groupCode: string;
 }
@@ -29,7 +28,6 @@ interface Props {
 const defaultForm: PendingUser = {
   name: "",
   email: "",
-  ID: "",
   role: "user",
   groupCode: "",
 };
@@ -60,8 +58,7 @@ export default function UserEntryForm({ onAdd }: Props) {
     return (
       form.name.trim() !== "" &&
       form.email.trim() !== "" &&
-      form.ID.trim() !== "" 
-      // form.groupCode.trim() !== ""
+      form.groupCode.trim() !== ""
     );
   }, [form]);
 
@@ -74,7 +71,6 @@ export default function UserEntryForm({ onAdd }: Props) {
       ...form,
       name: form.name.trim(),
       email: form.email.trim(),
-      ID: form.ID.trim(),
       groupCode: form.groupCode.trim().toUpperCase(),
     });
 
@@ -109,17 +105,7 @@ export default function UserEntryForm({ onAdd }: Props) {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="ID">Employee ID</Label>
 
-          <Input
-            id="ID"
-            name="ID"
-            placeholder="EMP001"
-            value={form.ID}
-            onChange={handleChange}
-          />
-        </div>
 
         <div className="space-y-2">
           <Label htmlFor="groupCode">Group Code</Label>

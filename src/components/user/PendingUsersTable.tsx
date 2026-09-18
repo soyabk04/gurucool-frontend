@@ -36,7 +36,6 @@ export default function PendingUsersTable({
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
-          <TableHead>Employee ID</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Group</TableHead>
           <TableHead className="text-right">
@@ -51,8 +50,6 @@ export default function PendingUsersTable({
             <TableCell>{user.name}</TableCell>
 
             <TableCell>{user.email}</TableCell>
-
-            <TableCell>{user.ID}</TableCell>
 
             <TableCell className="capitalize">
               {user.role}

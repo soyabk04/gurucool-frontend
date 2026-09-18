@@ -4,46 +4,170 @@ import type { Chapter, CreateChapter } from "@/types/course";
 export const createChapter = async (
   courseId: string,
   data: CreateChapter,
-  onProgress?: (progress: number) => void
+  onProgress?: (
+    progress: number
+  ) => void
 ): Promise<Chapter> => {
-  console.log("Creating chapter with data:", data);
+  const formData =
+    new FormData();
 
-  const formData = new FormData();
+  /*
+   * ==============================================
+   * Collect question images
+   * ==============================================
+   */
+
+  const questionImages: {
+    questionId: string;
+    file: File;
+  }[] = [];
+
+  /*
+   * ==============================================
+   * Prepare quiz data
+   * ==============================================
+   */
+
+  const quizData =
+    data.quizData
+      ? {
+          ...data.quizData,
+
+          questions:
+            data.quizData.questions.map(
+              (question) => {
+                const image = question.image as unknown;
+
+                if (
+                  image instanceof File
+                ) {
+                  questionImages.push({
+                    questionId:
+                      question._id,
+
+                    file:
+                      image,
+                  });
+
+                  return {
+                    ...question,
+
+                    /*
+                     * Don't put File into JSON.
+                     */
+                    image:
+                      undefined,
+                  };
+                }
+
+                return question;
+              }
+            ),
+        }
+      : undefined;
+
+  /*
+   * ==============================================
+   * Chapter JSON
+   * ==============================================
+   */
 
   formData.append(
     "chapter",
     JSON.stringify({
-      title: data.title,
-      description: data.description,
+      title:
+        data.title,
+
+      description:
+        data.description,
+
       courseId,
-      type: data.type,
-      quizData: data.quizData,
+
+      type:
+        data.type,
+
+      quizData,
     })
   );
 
+  /*
+   * ==============================================
+   * Main chapter file
+   * ==============================================
+   */
+
   if (data.file) {
-    formData.append("file", data.file);
+    formData.append(
+      "file",
+      data.file
+    );
   }
 
-  const response = await api.post(
-    "/courses/chapter",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  /*
+   * ==============================================
+   * Question images
+   * ==============================================
+   */
 
-      onUploadProgress: (event) => {
-        if (event.total && onProgress) {
-          const percent = Math.round(
-            (event.loaded * 100) / event.total
-          );
-
-          onProgress(percent);
-        }
-      },
+  questionImages.forEach(
+    ({
+      questionId,
+      file,
+    }) => {
+      formData.append(
+        `questionImage_${questionId}`,
+        file
+      );
     }
   );
+
+  /*
+   * ==============================================
+   * Debug
+   * ==============================================
+   */
+
+  console.log(
+    "Question images:",
+    questionImages
+  );
+
+  /*
+   * ==============================================
+   * Request
+   * ==============================================
+   */
+
+  const response =
+    await api.post(
+      "/courses/chapter",
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
+
+        onUploadProgress:
+          (event) => {
+            if (
+              event.total &&
+              onProgress
+            ) {
+              const percent =
+                Math.round(
+                  (event.loaded *
+                    100) /
+                    event.total
+                );
+
+              onProgress(
+                percent
+              );
+            }
+          },
+      }
+    );
 
   return response.data;
 };
@@ -54,9 +178,15 @@ export const getChapters = async (
   const response = await api.get(
     `/courses/course/${courseId}`
   );
-  console.log("Fetched chapters response:", response.data);
+
+  console.log(
+    "Fetched chapters response:",
+    response.data
+  );
+
   return response.data.chapters;
 };
+
 export const editChapter = async (
   chapterId: string,
   chapterData: Partial<Chapter>,
@@ -79,10 +209,7 @@ export const editChapter = async (
   }
 
   if (video) {
-    formData.append(
-      "video",
-      video
-    );
+    formData.append("video", video);
   }
 
   const response = await api.patch(
@@ -90,14 +217,9 @@ export const editChapter = async (
     formData,
     {
       onUploadProgress: (event) => {
-        if (
-          onProgress &&
-          event.total
-        ) {
+        if (onProgress && event.total) {
           const progress = Math.round(
-            (event.loaded /
-              event.total) *
-              100
+            (event.loaded / event.total) * 100
           );
 
           onProgress(progress);
@@ -108,6 +230,7 @@ export const editChapter = async (
 
   return response.data;
 };
+
 export const deleteChapter = async (
   chapterId: string
 ) => {

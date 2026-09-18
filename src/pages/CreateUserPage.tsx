@@ -38,7 +38,6 @@ export default function CreateUserPage() {
     ...user,
     name: user.name?.trim() || "",
     email: user.email?.trim().toLowerCase() || "",
-    ID: user.ID?.trim() || "",
     groupCode: user.groupCode?.trim().toUpperCase() || "",
   });
 
@@ -48,7 +47,7 @@ export default function CreateUserPage() {
   const addUser = useCallback((user: PendingUser) => {
     const normalized = normalizeUser(user);
 
-    if (!normalized.email || !normalized.ID) {
+    if (!normalized.email) {
       toast.warning("Invalid user data");
       return;
     }
@@ -56,8 +55,7 @@ export default function CreateUserPage() {
     setPendingUsers((prev) => {
       const exists = prev.some(
         (u) =>
-          u.email === normalized.email ||
-          u.ID === normalized.ID
+          u.email === normalized.email 
       );
 
       if (exists) {
@@ -80,14 +78,12 @@ export default function CreateUserPage() {
 
     setPendingUsers((prev) => {
       const emailSet = new Set(prev.map((u) => u.email));
-      const idSet = new Set(prev.map((u) => u.ID));
 
       const usersToAdd: PendingUser[] = [];
 
       for (const rawUser of users) {
         if (
           !rawUser?.email ||
-          !rawUser?.ID ||
           !rawUser?.name ||
           !rawUser?.groupCode
         ) {
@@ -98,15 +94,14 @@ export default function CreateUserPage() {
         const user = normalizeUser(rawUser);
 
         if (
-          emailSet.has(user.email) ||
-          idSet.has(user.ID)
+          emailSet.has(user.email)
         ) {
           toast.warning(`Duplicate skipped: ${user.email}`);
           continue;
         }
 
         emailSet.add(user.email);
-        idSet.add(user.ID);
+        
 
         usersToAdd.push(user);
       }
@@ -137,10 +132,10 @@ export default function CreateUserPage() {
     try {
       setLoading(true);
       setFailedUsers([]);
-      console.log(pendingUsers)
+      
 
       const response = await createUsers(pendingUsers);
-      console.log(pendingUsers)
+      console.log(response)
       if (!response?.success) {
         console.error("API failed:", response);
         toast.error(response?.data?.message)

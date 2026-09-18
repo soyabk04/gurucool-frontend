@@ -48,17 +48,12 @@ export default function OrganizationTable() {
   }
 const handleDeleteOrganization = async (organizationId: string) => {
   try {
-    await deleteOrganization(organizationId);
+    const res=await deleteOrganization(organizationId);
 
-    const index = organizations.findIndex(
-      item => item._id === organizationId
-    );
 
-    if (index !== -1) {
-      organizations.splice(index, 1);
-    }
-
+    if (res){
     toast.success("Organization deleted successfully");
+    };
   } catch (error: any) {
     toast.error(error?.message || "Failed to delete organization");
   }

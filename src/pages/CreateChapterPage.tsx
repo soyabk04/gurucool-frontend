@@ -15,12 +15,15 @@ import { createChapter } from "@/services/chapter.services";
 export default function CreateChapterPage() {
   const navigate = useNavigate();
   const { courseId } = useParams<{ courseId: string }>();
-  console.log(courseId)
+
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const handleSubmit = async (data: CreateChapter) => {
+  /**
+   * Create chapter
+   */
+  const handleSubmit = async (data: CreateChapter): Promise<void> => {
     if (!courseId) {
       alert("Course ID is missing");
       return;
@@ -30,34 +33,51 @@ export default function CreateChapterPage() {
       setLoading(true);
       setUploading(true);
       setProgress(0);
-      
-      await createChapter(courseId, data, (percent) => {
-        setProgress(percent);
-      });
 
+      console.log("Creating chapter...");
+      console.log("Course ID:", courseId);
+      console.log("Chapter data:", data);
+
+      await createChapter(
+        courseId,
+        data,
+        (percent: number) => {
+          setProgress(percent);
+        }
+      );
+
+      // Upload completed
       setProgress(100);
 
-      // Give the user a moment to see "Finalizing upload..."
-      await new Promise((resolve) =>
-        setTimeout(resolve, 700)
-      );
+      // Give the user a short moment to see completion
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 700);
+      });
 
       setUploading(false);
 
-      // Go back to the course after successful creation
+      // Redirect to course page
       navigate(`/courses/${courseId}`);
     } catch (error) {
       console.error("Failed to create chapter:", error);
 
       setUploading(false);
+      setProgress(0);
 
-      alert("Failed to create chapter");
+      alert("Failed to create chapter. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Cancel chapter creation
+   */
   const handleCancel = () => {
+    if (loading) {
+      return;
+    }
+
     if (courseId) {
       navigate(`/courses/${courseId}`);
     } else {
@@ -68,7 +88,8 @@ export default function CreateChapterPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
+
+        {/* ================= HEADER ================= */}
         <div className="mb-8">
           <Button
             type="button"
@@ -93,12 +114,14 @@ export default function CreateChapterPage() {
           </div>
         </div>
 
-        {/* Upload Progress */}
+        {/* ================= UPLOAD PROGRESS ================= */}
         {uploading && (
           <div className="sticky top-4 z-50 mb-6">
             <Card className="border-primary shadow-lg">
               <CardContent className="space-y-4 p-5">
-                <div className="flex items-start justify-between">
+
+                {/* Progress Header */}
+                <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold">
                       Uploading Chapter
@@ -115,26 +138,30 @@ export default function CreateChapterPage() {
                   </span>
                 </div>
 
+                {/* Progress Bar */}
                 <Progress
                   value={progress}
                   className="h-3"
                 />
 
+                {/* Progress Status */}
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>
                     {progress < 100
-                      ? "Uploading video..."
+                      ? "Uploading chapter..."
                       : "Finalizing upload..."}
                   </span>
 
-                  <span>{progress}%</span>
+                  <span>
+                    {progress}%
+                  </span>
                 </div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Chapter Form */}
+        {/* ================= CHAPTER FORM ================= */}
         <Card>
           <CardContent className="p-6">
             <ChapterForm
@@ -143,6 +170,7 @@ export default function CreateChapterPage() {
             />
           </CardContent>
         </Card>
+
       </div>
     </div>
   );

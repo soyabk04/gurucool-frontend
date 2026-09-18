@@ -28,6 +28,14 @@ interface ChapterQuizProps {
   onPassed: () => Promise<void> | void;
 }
 
+
+
+
+interface ChapterQuizProps {
+  questions: QuizQuestion[];
+  onPassed: () => Promise<void> | void;
+}
+
 export default function ChapterQuiz({
   questions,
   onPassed,
@@ -38,7 +46,8 @@ export default function ChapterQuiz({
 
   const [submitting, setSubmitting] = useState(false);
 
-  const [result, setResult] = useState<QuizSubmitResponse | null>(null);
+  const [result, setResult] =
+    useState<QuizSubmitResponse | null>(null);
 
   const currentQuestion = questions[currentIndex];
 
@@ -100,7 +109,9 @@ export default function ChapterQuiz({
       }));
 
       const quizResult = await submitQuiz(userAnswers);
+
       console.log("Quiz result:", quizResult);
+
       setResult(quizResult);
 
       if (quizResult.passed) {
@@ -118,6 +129,12 @@ export default function ChapterQuiz({
     setAnswers({});
     setResult(null);
   };
+
+  /*
+   * --------------------------------------------------
+   * No Questions
+   * --------------------------------------------------
+   */
 
   if (!questions.length) {
     return (
@@ -140,8 +157,11 @@ export default function ChapterQuiz({
   }
 
   /*
-   * Quiz result screen
+   * --------------------------------------------------
+   * Quiz Result
+   * --------------------------------------------------
    */
+
   if (result) {
     const percentage =
       result.totalMarks === 0
@@ -223,6 +243,12 @@ export default function ChapterQuiz({
 
   const answeredCount = Object.keys(answers).length;
 
+  /*
+   * --------------------------------------------------
+   * Quiz
+   * --------------------------------------------------
+   */
+
   return (
     <Card className="overflow-hidden rounded-2xl border bg-card">
       <CardHeader className="border-b px-6 py-5">
@@ -267,6 +293,8 @@ export default function ChapterQuiz({
 
       <CardContent className="p-6">
         <div className="mx-auto max-w-3xl">
+
+          {/* Question */}
           <div className="mb-6">
             <p className="mb-2 text-sm font-medium text-muted-foreground">
               Question {currentIndex + 1}
@@ -276,12 +304,26 @@ export default function ChapterQuiz({
               {currentQuestion.question}
             </h3>
 
+            {/* Question Image */}
+            {currentQuestion.image && (
+              <div className="mt-5 overflow-hidden rounded-xl border bg-muted/20">
+                <img
+                  src={currentQuestion.image}
+                  alt={`Question ${currentIndex + 1}`}
+                  className="max-h-[400px] w-full object-contain"
+                />
+              </div>
+            )}
+
             <p className="mt-2 text-xs text-muted-foreground">
               {currentQuestion.marks}{" "}
-              {currentQuestion.marks === 1 ? "mark" : "marks"}
+              {currentQuestion.marks === 1
+                ? "mark"
+                : "marks"}
             </p>
           </div>
 
+          {/* Options */}
           <RadioGroup
             value={selectedAnswer}
             onValueChange={handleAnswerChange}
@@ -289,7 +331,8 @@ export default function ChapterQuiz({
           >
             {currentQuestion.options.map(
               (option, index) => {
-                const optionId = `${currentQuestion._id}-${index}`;
+                const optionId =
+                  `${currentQuestion._id}-${index}`;
 
                 return (
                   <Label
@@ -321,12 +364,15 @@ export default function ChapterQuiz({
             )}
           </RadioGroup>
 
+          {/* Navigation */}
           <div className="mt-8 flex items-center justify-between gap-4 border-t pt-5">
             <Button
               type="button"
               variant="outline"
               onClick={handlePrevious}
-              disabled={currentIndex === 0 || submitting}
+              disabled={
+                currentIndex === 0 || submitting
+              }
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Previous
@@ -336,7 +382,9 @@ export default function ChapterQuiz({
               <Button
                 type="button"
                 onClick={handleNext}
-                disabled={!selectedAnswer || submitting}
+                disabled={
+                  !selectedAnswer || submitting
+                }
               >
                 Next
                 <ChevronRight className="ml-2 h-4 w-4" />

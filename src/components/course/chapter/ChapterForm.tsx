@@ -1,4 +1,12 @@
-import { useState } from "react";
+import {
+  useState,
+  type FormEvent,
+} from "react";
+
+import {
+  Image,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,54 +30,89 @@ import type {
 interface ChapterFormProps {
   loading?: boolean;
   initialValues?: Partial<CreateChapter>;
-  onSubmit: (data: CreateChapter) => Promise<void>;
+  onSubmit: (
+    data: CreateChapter
+  ) => Promise<void>;
 }
 
-const createEmptyQuestion = (): QuizQuestion => ({
-  _id: crypto.randomUUID(),
-  question: "",
-  options: ["", "", "", ""],
-  answer: "",
-  marks: 1,
-});
+/* =========================================================
+   CREATE EMPTY QUESTION
+========================================================= */
+
+const createEmptyQuestion =
+  (): QuizQuestion => ({
+    _id: crypto.randomUUID(),
+    question: "",
+    image: undefined,
+    options: [
+      "",
+      "",
+      "",
+      "",
+    ],
+    answer: "",
+    marks: 1,
+  });
+
+/* =========================================================
+   CREATE EMPTY QUIZ
+========================================================= */
 
 const createEmptyQuiz = () => ({
   passingMarks: 0,
   totalMarks: 1,
-  questions: [createEmptyQuestion()],
+  questions: [
+    createEmptyQuestion(),
+  ],
 });
+
+/* =========================================================
+   COMPONENT
+========================================================= */
 
 export default function ChapterForm({
   loading = false,
   initialValues,
   onSubmit,
 }: ChapterFormProps) {
-  const [form, setForm] = useState<CreateChapter>({
-    title: initialValues?.title ?? "",
-    description: initialValues?.description ?? "",
-    type: initialValues?.type ?? "video",
-    file: null,
-    quizData: initialValues?.quizData,
-  });
+  const [form, setForm] =
+    useState<CreateChapter>({
+      title:
+        initialValues?.title ?? "",
 
-  const [fileName, setFileName] = useState("");
+      description:
+        initialValues?.description ?? "",
 
-  const hasQuiz = !!form.quizData;
+      type:
+        initialValues?.type ?? "video",
 
-  // --------------------------------------------------
-  // Enable Quiz
-  // --------------------------------------------------
+      file: null,
+
+      quizData:
+        initialValues?.quizData,
+    });
+
+  const [fileName, setFileName] =
+    useState("");
+
+  const hasQuiz =
+    !!form.quizData;
+
+  /* =========================================================
+     ENABLE QUIZ
+  ========================================================= */
 
   const enableQuiz = () => {
     setForm((prev) => ({
       ...prev,
-      quizData: createEmptyQuiz(),
+      quizData:
+        createEmptyQuiz(),
     }));
   };
 
-  // --------------------------------------------------
-  // Remove Quiz
-  // --------------------------------------------------
+  /* =========================================================
+     REMOVE QUIZ
+  ========================================================= */
 
   const disableQuiz = () => {
     setForm((prev) => ({
@@ -78,9 +121,9 @@ export default function ChapterForm({
     }));
   };
 
-  // --------------------------------------------------
-  // Update Question
-  // --------------------------------------------------
+  /* =========================================================
+     UPDATE QUESTION
+  ========================================================= */
 
   const updateQuestion = (
     questionIndex: number,
@@ -91,7 +134,9 @@ export default function ChapterForm({
         return prev;
       }
 
-      const questions = [...prev.quizData.questions];
+      const questions = [
+        ...prev.quizData.questions,
+      ];
 
       questions[questionIndex] = {
         ...questions[questionIndex],
@@ -101,11 +146,13 @@ export default function ChapterForm({
         answer:
           data.answer !== undefined
             ? data.answer ?? ""
-            : questions[questionIndex].answer ?? "",
+            : questions[questionIndex]
+                .answer ?? "",
       };
 
       return {
         ...prev,
+
         quizData: {
           ...prev.quizData,
           questions,
@@ -114,9 +161,9 @@ export default function ChapterForm({
     });
   };
 
-  // --------------------------------------------------
-  // Update Option
-  // --------------------------------------------------
+  /* =========================================================
+     UPDATE OPTION
+  ========================================================= */
 
   const updateOption = (
     questionIndex: number,
@@ -128,38 +175,43 @@ export default function ChapterForm({
         return prev;
       }
 
-      const questions = [...prev.quizData.questions];
+      const questions = [
+        ...prev.quizData.questions,
+      ];
 
-      const currentQuestion = questions[questionIndex];
+      const currentQuestion =
+        questions[questionIndex];
 
       const oldOption =
-        currentQuestion.options[optionIndex];
+        currentQuestion.options[
+          optionIndex
+        ];
 
       const options = [
         ...currentQuestion.options,
-      ] as [
-        string,
-        string,
-        string,
-        string
       ];
 
-      options[optionIndex] = value;
+      options[optionIndex] =
+        value;
 
       questions[questionIndex] = {
         ...currentQuestion,
+
         options,
 
-        // If this option was the correct answer,
-        // update the answer when the option changes.
+        // If this option was the correct
+        // answer, update the answer.
         answer:
-          (currentQuestion.answer ?? "") === oldOption
+          (currentQuestion.answer ??
+            "") === oldOption
             ? value
-            : currentQuestion.answer ?? "",
+            : currentQuestion.answer ??
+              "",
       };
 
       return {
         ...prev,
+
         quizData: {
           ...prev.quizData,
           questions,
@@ -168,9 +220,98 @@ export default function ChapterForm({
     });
   };
 
-  // --------------------------------------------------
-  // Add Question
-  // --------------------------------------------------
+  /* =========================================================
+     QUESTION IMAGE
+  ========================================================= */
+
+  const handleQuestionImageChange = (
+    questionIndex: number,
+    file: File | null
+  ) => {
+    if (!file) {
+      return;
+    }
+
+    /* -------------------------------------------------------
+       Validate image type
+    ------------------------------------------------------- */
+
+    const allowedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+
+    if (
+      !allowedTypes.includes(
+        file.type
+      )
+    ) {
+      alert(
+        "Invalid image format. Please use PNG, JPG, JPEG or WebP."
+      );
+
+      return;
+    }
+
+    /* -------------------------------------------------------
+       Validate image size
+       Maximum: 5 MB
+    ------------------------------------------------------- */
+
+    const maxSize =
+      5 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      alert(
+        "Question image must be less than 5 MB."
+      );
+
+      return;
+    }
+
+    /*
+     * IMPORTANT:
+     *
+     * Store the actual File.
+     *
+     * Do NOT use:
+     *
+     * URL.createObjectURL(file)
+     *
+     * because the API needs the actual File
+     * to append it to FormData.
+     */
+
+    updateQuestion(
+      questionIndex,
+      {
+        // QuizQuestion.image is typed as a string for persisted image URLs,
+        // but uploads are kept as the actual File until submission.
+        image: file as unknown as QuizQuestion["image"],
+      }
+    );
+  };
+
+  /* =========================================================
+     REMOVE QUESTION IMAGE
+  ========================================================= */
+
+  const removeQuestionImage = (
+    questionIndex: number
+  ) => {
+    updateQuestion(
+      questionIndex,
+      {
+        image: undefined,
+      }
+    );
+  };
+
+  /* =========================================================
+     ADD QUESTION
+  ========================================================= */
 
   const addQuestion = () => {
     setForm((prev) => {
@@ -180,8 +321,10 @@ export default function ChapterForm({
 
       return {
         ...prev,
+
         quizData: {
           ...prev.quizData,
+
           questions: [
             ...prev.quizData.questions,
             createEmptyQuestion(),
@@ -191,37 +334,46 @@ export default function ChapterForm({
     });
   };
 
-  // --------------------------------------------------
-  // Remove Question
-  // --------------------------------------------------
+  /* =========================================================
+     REMOVE QUESTION
+  ========================================================= */
 
-  const removeQuestion = (index: number) => {
+  const removeQuestion = (
+    index: number
+  ) => {
     setForm((prev) => {
       if (!prev.quizData) {
         return prev;
       }
 
-      if (prev.quizData.questions.length === 1) {
+      // Don't allow removing the last question
+      if (
+        prev.quizData.questions
+          .length === 1
+      ) {
         return prev;
       }
 
       return {
         ...prev,
+
         quizData: {
           ...prev.quizData,
+
           questions:
             prev.quizData.questions.filter(
               (_, questionIndex) =>
-                questionIndex !== index
+                questionIndex !==
+                index
             ),
         },
       };
     });
   };
 
-  // --------------------------------------------------
-  // Validate Quiz
-  // --------------------------------------------------
+  /* =========================================================
+     VALIDATE QUIZ
+  ========================================================= */
 
   const validateQuiz = (): boolean => {
     if (!form.quizData) {
@@ -234,48 +386,108 @@ export default function ChapterForm({
       questions,
     } = form.quizData;
 
+    /* -------------------------------------------------------
+       Total marks
+    ------------------------------------------------------- */
+
     if (totalMarks < 1) {
-      alert("Total marks must be at least 1");
+      alert(
+        "Total marks must be at least 1"
+      );
+
       return false;
     }
+
+    /* -------------------------------------------------------
+       Passing marks
+    ------------------------------------------------------- */
 
     if (passingMarks < 0) {
-      alert("Passing marks cannot be negative");
+      alert(
+        "Passing marks cannot be negative"
+      );
+
       return false;
     }
 
-    if (passingMarks > totalMarks) {
+    if (
+      passingMarks >
+      totalMarks
+    ) {
       alert(
         "Passing marks cannot exceed total marks"
       );
+
       return false;
     }
 
-    if (questions.length === 0) {
-      alert("Please add at least one question");
+    /* -------------------------------------------------------
+       Questions
+    ------------------------------------------------------- */
+
+    if (
+      questions.length === 0
+    ) {
+      alert(
+        "Please add at least one question"
+      );
+
       return false;
     }
 
-    for (let i = 0; i < questions.length; i++) {
-      const question = questions[i];
+    /* -------------------------------------------------------
+       Validate each question
+    ------------------------------------------------------- */
 
-      if (!question.question.trim()) {
+    for (
+      let i = 0;
+      i < questions.length;
+      i++
+    ) {
+      const question =
+        questions[i];
+
+      /* -----------------------------------------------------
+         Question text
+      ----------------------------------------------------- */
+
+      if (
+        !question.question.trim()
+      ) {
         alert(
-          `Question ${i + 1} is required`
+          `Question ${
+            i + 1
+          } is required`
         );
+
         return false;
       }
 
-      if (question.options.length !== 4) {
+      /* -----------------------------------------------------
+         Exactly 4 options
+      ----------------------------------------------------- */
+
+      if (
+        question.options.length !==
+        4
+      ) {
         alert(
-          `Question ${i + 1} must have exactly 4 options`
+          `Question ${
+            i + 1
+          } must have exactly 4 options`
         );
+
         return false;
       }
+
+      /* -----------------------------------------------------
+         All options required
+      ----------------------------------------------------- */
 
       if (
         question.options.some(
-          (option) => !option.trim()
+          (option) =>
+            !option.trim()
         )
       ) {
         alert(
@@ -283,17 +495,29 @@ export default function ChapterForm({
             i + 1
           }`
         );
+
         return false;
       }
 
-      if (!question.answer?.trim()) {
+      /* -----------------------------------------------------
+         Correct answer
+      ----------------------------------------------------- */
+
+      if (
+        !question.answer?.trim()
+      ) {
         alert(
           `Please select the correct answer for Question ${
             i + 1
           }`
         );
+
         return false;
       }
+
+      /* -----------------------------------------------------
+         Correct answer must exist in options
+      ----------------------------------------------------- */
 
       if (
         !question.options.includes(
@@ -305,71 +529,174 @@ export default function ChapterForm({
             i + 1
           }`
         );
+
         return false;
       }
 
-      if (question.marks < 1) {
+      /* -----------------------------------------------------
+         Marks
+      ----------------------------------------------------- */
+
+      if (
+        question.marks < 1
+      ) {
         alert(
           `Marks for Question ${
             i + 1
           } must be at least 1`
         );
+
         return false;
       }
+
+      /* -----------------------------------------------------
+         Image validation
+         Only validate if an image exists
+      ----------------------------------------------------- */
+
+      const image: unknown =
+        question.image;
+
+      if (
+        image instanceof File
+      ) {
+        const allowedTypes = [
+          "image/png",
+          "image/jpeg",
+          "image/jpg",
+          "image/webp",
+        ];
+
+        if (
+          !allowedTypes.includes(
+            image.type
+          )
+        ) {
+          alert(
+            `Invalid image format for Question ${
+              i + 1
+            }`
+          );
+
+          return false;
+        }
+
+        const maxSize =
+          5 * 1024 * 1024;
+
+        if (
+          image.size > maxSize
+        ) {
+          alert(
+            `Image for Question ${
+              i + 1
+            } must be less than 5 MB`
+          );
+
+          return false;
+        }
+      }
     }
+
+    /* -------------------------------------------------------
+       Calculate marks
+    ------------------------------------------------------- */
 
     const calculatedMarks =
       questions.reduce(
         (total, question) =>
-          total + question.marks,
+          total +
+          question.marks,
         0
       );
 
-    if (calculatedMarks !== totalMarks) {
+    /* -------------------------------------------------------
+       Validate total marks
+    ------------------------------------------------------- */
+
+    if (
+      calculatedMarks !==
+      totalMarks
+    ) {
       alert(
         `Total marks (${totalMarks}) must equal the sum of question marks (${calculatedMarks})`
       );
+
       return false;
     }
 
     return true;
   };
 
-  // --------------------------------------------------
-  // Submit
-  // --------------------------------------------------
+  /* =========================================================
+     SUBMIT
+  ========================================================= */
 
   const handleSubmit = async (
-    e: React.FormEvent
+    e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
+    /* -------------------------------------------------------
+       Chapter title
+    ------------------------------------------------------- */
+
     if (!form.title.trim()) {
-      alert("Chapter title is required");
+      alert(
+        "Chapter title is required"
+      );
+
       return;
     }
 
-    // Video/PDF requires file
+    /* -------------------------------------------------------
+       Video/PDF requires file
+    ------------------------------------------------------- */
+
     if (!form.file) {
       alert(
         form.type === "video"
           ? "Please select a video"
           : "Please select a PDF"
       );
+
       return;
     }
 
-    // Validate quiz if enabled
+    /* -------------------------------------------------------
+       Validate quiz
+    ------------------------------------------------------- */
+
     if (hasQuiz) {
-      if (!validateQuiz()) {
+      if (
+        !validateQuiz()
+      ) {
         return;
       }
     }
 
     try {
+      console.log(
+        "Submitting chapter:",
+        form
+      );
+
+      console.log(
+        "Submit handler:",
+        onSubmit
+      );
+
+      console.log(
+        "Submit handler type:",
+        typeof onSubmit
+      );
+
       await onSubmit(form);
 
-      // Reset
+      /* -----------------------------------------------------
+         Reset form
+      ----------------------------------------------------- */
+
       setForm({
         title: "",
         description: "",
@@ -387,9 +714,9 @@ export default function ChapterForm({
     }
   };
 
-  // --------------------------------------------------
-  // Change Content Type
-  // --------------------------------------------------
+  /* =========================================================
+     CHANGE CONTENT TYPE
+  ========================================================= */
 
   const handleTypeChange = (
     value: string | null
@@ -400,35 +727,40 @@ export default function ChapterForm({
 
     setForm((prev) => ({
       ...prev,
-      type: value as ChapterType,
+
+      type:
+        value as ChapterType,
+
       file: null,
     }));
 
     setFileName("");
   };
 
-  // --------------------------------------------------
-  // Calculated Marks
-  // --------------------------------------------------
+  /* =========================================================
+     CALCULATED MARKS
+  ========================================================= */
 
   const calculatedMarks =
     form.quizData?.questions.reduce(
       (total, question) =>
-        total + question.marks,
+        total +
+        question.marks,
       0
     ) ?? 0;
-  // --------------------------------------------------
-  // UI
-  // --------------------------------------------------
+
+  /* =========================================================
+     UI
+  ========================================================= */
 
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-6"
     >
-      {/* ------------------------------------------ */}
-      {/* Chapter Title */}
-      {/* ------------------------------------------ */}
+      {/* =====================================================
+          CHAPTER TITLE
+      ===================================================== */}
 
       <div className="space-y-2">
         <Label htmlFor="title">
@@ -442,15 +774,16 @@ export default function ChapterForm({
           onChange={(e) =>
             setForm((prev) => ({
               ...prev,
-              title: e.target.value,
+              title:
+                e.target.value,
             }))
           }
         />
       </div>
 
-      {/* ------------------------------------------ */}
-      {/* Description */}
-      {/* ------------------------------------------ */}
+      {/* =====================================================
+          DESCRIPTION
+      ===================================================== */}
 
       <div className="space-y-2">
         <Label htmlFor="description">
@@ -461,26 +794,36 @@ export default function ChapterForm({
           id="description"
           rows={4}
           placeholder="Chapter description..."
-          value={form.description}
+          value={
+            form.description
+          }
           onChange={(e) =>
             setForm((prev) => ({
               ...prev,
-              description: e.target.value,
+              description:
+                e.target.value,
             }))
           }
         />
       </div>
 
-      {/* ------------------------------------------ */}
-      {/* Content Type */}
-      {/* ------------------------------------------ */}
+      {/* =====================================================
+          CONTENT TYPE
+      ===================================================== */}
 
       <div className="space-y-2">
-        <Label>Content Type</Label>
+        <Label>
+          Content Type
+        </Label>
 
         <Select
-          value={form.type}
-          onValueChange={handleTypeChange}
+          value={
+            form.type ??
+            undefined
+          }
+          onValueChange={
+            handleTypeChange
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Select content type" />
@@ -498,9 +841,9 @@ export default function ChapterForm({
         </Select>
       </div>
 
-      {/* ------------------------------------------ */}
-      {/* File Upload */}
-      {/* ------------------------------------------ */}
+      {/* =====================================================
+          FILE UPLOAD
+      ===================================================== */}
 
       <div className="space-y-2">
         <Label>
@@ -518,7 +861,8 @@ export default function ChapterForm({
           }
           onChange={(e) => {
             const file =
-              e.target.files?.[0] ?? null;
+              e.target.files?.[0] ??
+              null;
 
             setForm((prev) => ({
               ...prev,
@@ -533,18 +877,17 @@ export default function ChapterForm({
 
         {fileName && (
           <p className="text-sm text-muted-foreground">
-            Selected: {fileName}
+            Selected:{" "}
+            {fileName}
           </p>
         )}
       </div>
 
-      {/* ========================================== */}
-      {/* QUIZ SECTION */}
-      {/* ========================================== */}
+      {/* =====================================================
+          QUIZ SECTION
+      ===================================================== */}
 
       <div className="rounded-lg border">
-        {/* Quiz Header */}
-
         <div className="flex items-center justify-between p-5">
           <div>
             <h3 className="text-lg font-semibold">
@@ -552,7 +895,8 @@ export default function ChapterForm({
             </h3>
 
             <p className="text-sm text-muted-foreground">
-              Optionally add a quiz to this chapter.
+              Optionally add a quiz
+              to this chapter.
             </p>
           </div>
 
@@ -560,7 +904,9 @@ export default function ChapterForm({
             <Button
               type="button"
               variant="outline"
-              onClick={enableQuiz}
+              onClick={
+                enableQuiz
+              }
             >
               + Add Quiz
             </Button>
@@ -569,383 +915,535 @@ export default function ChapterForm({
               type="button"
               variant="destructive"
               size="sm"
-              onClick={disableQuiz}
+              onClick={
+                disableQuiz
+              }
             >
               Remove Quiz
             </Button>
           )}
         </div>
 
-        {/* Quiz Body */}
+        {hasQuiz &&
+          form.quizData && (
+            <div className="space-y-6 border-t p-5">
 
-        {hasQuiz && form.quizData && (
-          <div className="space-y-6 border-t p-5">
-            {/* -------------------------------------- */}
-            {/* Quiz Marks */}
-            {/* -------------------------------------- */}
+              {/* =================================================
+                  QUIZ MARKS
+              ================================================= */}
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {/* Total Marks */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-              <div className="space-y-2">
-                <Label>
-                  Total Marks
-                </Label>
+                {/* TOTAL MARKS */}
 
-                <Input
-                  type="number"
-                  min={1}
-                  value={
-                    form.quizData.totalMarks
-                  }
-                  onChange={(e) => {
-                    const value =
-                      Number(
-                        e.target.value
+                <div className="space-y-2">
+                  <Label>
+                    Total Marks
+                  </Label>
+
+                  <Input
+                    type="number"
+                    min={1}
+                    value={
+                      form.quizData
+                        .totalMarks
+                    }
+                    onChange={(e) => {
+                      const value =
+                        Number(
+                          e.target.value
+                        );
+
+                      setForm(
+                        (prev) => ({
+                          ...prev,
+
+                          quizData:
+                            prev.quizData
+                              ? {
+                                  ...prev.quizData,
+
+                                  totalMarks:
+                                    value,
+                                }
+                              : undefined,
+                        })
                       );
+                    }}
+                  />
+                </div>
 
-                    setForm((prev) => ({
-                      ...prev,
-                      quizData:
-                        prev.quizData
-                          ? {
-                              ...prev.quizData,
-                              totalMarks:
-                                value,
-                            }
-                          : undefined,
-                    }));
-                  }}
-                />
-              </div>
+                {/* PASSING MARKS */}
 
-              {/* Passing Marks */}
+                <div className="space-y-2">
+                  <Label>
+                    Passing Marks
+                  </Label>
 
-              <div className="space-y-2">
-                <Label>
-                  Passing Marks
-                </Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={
+                      form.quizData
+                        .passingMarks
+                    }
+                    onChange={(e) => {
+                      const value =
+                        Number(
+                          e.target.value
+                        );
 
-                <Input
-                  type="number"
-                  min={0}
-                  value={
-                    form.quizData
-                      .passingMarks
-                  }
-                  onChange={(e) => {
-                    const value =
-                      Number(
-                        e.target.value
+                      setForm(
+                        (prev) => ({
+                          ...prev,
+
+                          quizData:
+                            prev.quizData
+                              ? {
+                                  ...prev.quizData,
+
+                                  passingMarks:
+                                    value,
+                                }
+                              : undefined,
+                        })
                       );
+                    }}
+                  />
+                </div>
+              </div>
 
-                    setForm((prev) => ({
-                      ...prev,
-                      quizData:
-                        prev.quizData
-                          ? {
-                              ...prev.quizData,
-                              passingMarks:
-                                value,
+              {/* =================================================
+                  QUESTIONS HEADER
+              ================================================= */}
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">
+                    Questions
+                  </h3>
+
+                  <p className="text-sm text-muted-foreground">
+                    Add questions with
+                    four options.
+                    Images are
+                    optional.
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={
+                    addQuestion
+                  }
+                >
+                  + Add Question
+                </Button>
+              </div>
+
+              {/* =================================================
+                  QUESTIONS
+              ================================================= */}
+
+              <div className="space-y-5">
+                {form.quizData.questions.map(
+                  (
+                    question,
+                    questionIndex
+                  ) => (
+                    <div
+                      key={
+                        question._id
+                      }
+                      className="space-y-5 rounded-lg border p-5"
+                    >
+                      {/* =========================================
+                          QUESTION HEADER
+                      ========================================= */}
+
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">
+                          Question{" "}
+                          {questionIndex +
+                            1}
+                        </h4>
+
+                        {form
+                          .quizData!
+                          .questions
+                          .length >
+                          1 && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              removeQuestion(
+                                questionIndex
+                              )
                             }
-                          : undefined,
-                    }));
-                  }}
-                />
-              </div>
-            </div>
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
 
-            {/* -------------------------------------- */}
-            {/* Questions Header */}
-            {/* -------------------------------------- */}
+                      {/* =========================================
+                          QUESTION TEXT
+                      ========================================= */}
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">
-                  Questions
-                </h3>
+                      <div className="space-y-2">
+                        <Label>
+                          Question
+                        </Label>
 
-                <p className="text-sm text-muted-foreground">
-                  Add questions with four options.
-                </p>
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addQuestion}
-              >
-                + Add Question
-              </Button>
-            </div>
-
-            {/* -------------------------------------- */}
-            {/* Questions */}
-            {/* -------------------------------------- */}
-
-            <div className="space-y-5">
-              {form.quizData.questions.map(
-                (
-                  question,
-                  questionIndex
-                ) => (
-                  <div
-                    key={questionIndex}
-                    className="space-y-5 rounded-lg border p-5"
-                  >
-                    {/* Question Header */}
-
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">
-                        Question{" "}
-                        {questionIndex + 1}
-                      </h4>
-
-                      {form.quizData!.questions
-                        .length > 1 && (
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() =>
-                            removeQuestion(
-                              questionIndex
+                        <Textarea
+                          placeholder="Enter question..."
+                          value={
+                            question.question
+                          }
+                          onChange={(e) =>
+                            updateQuestion(
+                              questionIndex,
+                              {
+                                question:
+                                  e.target
+                                    .value,
+                              }
                             )
                           }
-                        >
-                          Remove
-                        </Button>
-                      )}
-                    </div>
+                        />
+                      </div>
 
-                    {/* Question */}
+                      {/* =========================================
+                          QUESTION IMAGE
+                      ========================================= */}
 
-                    <div className="space-y-2">
-                      <Label>
-                        Question
-                      </Label>
+                      <div className="space-y-3">
+                        <div>
+                          <Label>
+                            Question Image
 
-                      <Textarea
-                        placeholder="Enter question..."
-                        value={
-                          question.question
-                        }
-                        onChange={(e) =>
-                          updateQuestion(
-                            questionIndex,
-                            {
-                              question:
-                                e.target
-                                  .value,
-                            }
-                          )
-                        }
-                      />
-                    </div>
+                            <span className="ml-1 text-muted-foreground">
+                              (Optional)
+                            </span>
+                          </Label>
 
-                    {/* Options */}
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Add an image
+                            to help
+                            explain the
+                            question.
+                            PNG, JPG,
+                            JPEG or
+                            WebP.
+                            Maximum
+                            5 MB.
+                          </p>
+                        </div>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {question.options.map(
-                        (
-                          option,
-                          optionIndex
-                        ) => (
-                          <div
-                            key={
-                              optionIndex
-                            }
-                            className="space-y-2"
+                        {/* =======================================
+                            UPLOAD BUTTON
+                        ======================================= */}
+
+                        <div>
+                          <label
+                            htmlFor={`question-image-${question._id}`}
+                            className="flex w-fit cursor-pointer items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
                           >
-                            <Label>
-                              Option{" "}
-                              {String.fromCharCode(
-                                65 +
-                                  optionIndex
-                              )}
-                            </Label>
+                            <Image className="h-4 w-4" />
 
-                            <Input
-                              placeholder={`Option ${String.fromCharCode(
-                                65 +
-                                  optionIndex
-                              )}`}
-                              value={option}
-                              onChange={(e) =>
-                                updateOption(
-                                  questionIndex,
-                                  optionIndex,
-                                  e.target
-                                    .value
+                            {question.image
+                              ? "Change Image"
+                              : "Upload Image"}
+                          </label>
+
+                          <Input
+                            id={`question-image-${question._id}`}
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file =
+                                e.target.files?.[0] ??
+                                null;
+
+                              handleQuestionImageChange(
+                                questionIndex,
+                                file
+                              );
+
+                              /*
+                               * Allow selecting
+                               * the same image
+                               * again.
+                               */
+                              e.target.value =
+                                "";
+                            }}
+                          />
+                        </div>
+
+                        {/* =======================================
+                            IMAGE PREVIEW
+                        ======================================= */}
+
+                        {question.image && (
+                          <div className="relative w-fit overflow-hidden rounded-lg border bg-muted">
+                            <img
+                              src={
+                                typeof question.image ===
+                                "string"
+                                  ? question.image
+                                  : URL.createObjectURL(
+                                      question.image
+                                    )
+                              }
+                              alt={`Question ${
+                                questionIndex +
+                                1
+                              }`}
+                              className="max-h-64 max-w-md object-contain"
+                            />
+
+                            {/* REMOVE BUTTON */}
+
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute right-2 top-2 h-8 w-8"
+                              onClick={() =>
+                                removeQuestionImage(
+                                  questionIndex
                                 )
                               }
-                            />
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
-                        )
-                      )}
-                    </div>
+                        )}
+                      </div>
 
-                    {/* Correct Answer */}
+                      {/* =========================================
+                          OPTIONS
+                      ========================================= */}
 
-                    <div className="space-y-2">
-                      <Label>
-                        Correct Answer
-                      </Label>
-
-                      <Select
-                        value={
-                          question.answer ??
-                          ""
-                        }
-                        onValueChange={(
-                          value
-                        ) => {
-                          updateQuestion(
-                            questionIndex,
-                            {
-                              answer:
-                                value ??
-                                "",
-                            }
-                          );
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select correct answer" />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          {question.options.map(
-                            (
-                              option,
-                              optionIndex
-                            ) => {
-                              if (
-                                !option.trim()
-                              ) {
-                                return null;
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {question.options.map(
+                          (
+                            option,
+                            optionIndex
+                          ) => (
+                            <div
+                              key={
+                                optionIndex
                               }
-
-                              return (
-                                <SelectItem
-                                  key={
+                              className="space-y-2"
+                            >
+                              <Label>
+                                Option{" "}
+                                {String.fromCharCode(
+                                  65 +
                                     optionIndex
-                                  }
-                                  value={
-                                    option
-                                  }
-                                >
-                                  Option{" "}
-                                  {String.fromCharCode(
-                                    65 +
-                                      optionIndex
-                                  )}{" "}
-                                  —{" "}
-                                  {option}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                                )}
+                              </Label>
 
-                    {/* Marks */}
+                              <Input
+                                placeholder={`Option ${String.fromCharCode(
+                                  65 +
+                                    optionIndex
+                                )}`}
+                                value={
+                                  option
+                                }
+                                onChange={(
+                                  e
+                                ) =>
+                                  updateOption(
+                                    questionIndex,
+                                    optionIndex,
+                                    e.target
+                                      .value
+                                  )
+                                }
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label>
-                        Marks
-                      </Label>
+                      {/* =========================================
+                          CORRECT ANSWER
+                      ========================================= */}
 
-                      <Input
-                        type="number"
-                        min={1}
-                        value={
-                          question.marks
-                        }
-                        onChange={(e) => {
-                          const value =
-                            Number(
-                              e.target
-                                .value
+                      <div className="space-y-2">
+                        <Label>
+                          Correct Answer
+                        </Label>
+
+                        <Select
+                          value={
+                            question.answer ??
+                            ""
+                          }
+                          onValueChange={(
+                            value
+                          ) => {
+                            updateQuestion(
+                              questionIndex,
+                              {
+                                answer:
+                                  value ??
+                                  "",
+                              }
                             );
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select correct answer" />
+                          </SelectTrigger>
 
-                          updateQuestion(
-                            questionIndex,
-                            {
-                              marks: Math.max(
-                                1,
-                                value ||
-                                  1
-                              ),
-                            }
-                          );
-                        }}
-                      />
+                          <SelectContent>
+                            {question.options.map(
+                              (
+                                option,
+                                optionIndex
+                              ) => {
+                                if (
+                                  !option.trim()
+                                ) {
+                                  return null;
+                                }
+
+                                return (
+                                  <SelectItem
+                                    key={
+                                      optionIndex
+                                    }
+                                    value={
+                                      option
+                                    }
+                                  >
+                                    Option{" "}
+                                    {String.fromCharCode(
+                                      65 +
+                                        optionIndex
+                                    )}{" "}
+                                    —{" "}
+                                    {
+                                      option
+                                    }
+                                  </SelectItem>
+                                );
+                              }
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* =========================================
+                          MARKS
+                      ========================================= */}
+
+                      <div className="space-y-2">
+                        <Label>
+                          Marks
+                        </Label>
+
+                        <Input
+                          type="number"
+                          min={1}
+                          value={
+                            question.marks
+                          }
+                          onChange={(e) => {
+                            const value =
+                              Number(
+                                e.target
+                                  .value
+                              );
+
+                            updateQuestion(
+                              questionIndex,
+                              {
+                                marks:
+                                  Math.max(
+                                    1,
+                                    value ||
+                                      1
+                                  ),
+                              }
+                            );
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                )
-              )}
+                  )
+                )}
+              </div>
+
+              {/* =================================================
+                  MARKS SUMMARY
+              ================================================= */}
+
+              <div className="rounded-md bg-muted p-4 text-sm">
+                <div className="flex justify-between">
+                  <span>
+                    Question marks
+                  </span>
+
+                  <span className="font-medium">
+                    {
+                      calculatedMarks
+                    }
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>
+                    Quiz total marks
+                  </span>
+
+                  <span className="font-medium">
+                    {
+                      form.quizData
+                        .totalMarks
+                    }
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>
+                    Passing marks
+                  </span>
+
+                  <span className="font-medium">
+                    {
+                      form.quizData
+                        .passingMarks
+                    }
+                  </span>
+                </div>
+
+                {calculatedMarks !==
+                  form.quizData
+                    .totalMarks && (
+                  <p className="mt-3 text-sm text-destructive">
+                    Question marks must
+                    equal the quiz total
+                    marks.
+                  </p>
+                )}
+              </div>
             </div>
-
-            {/* -------------------------------------- */}
-            {/* Marks Summary */}
-            {/* -------------------------------------- */}
-
-            <div className="rounded-md bg-muted p-4 text-sm">
-              <div className="flex justify-between">
-                <span>
-                  Question marks
-                </span>
-
-                <span className="font-medium">
-                  {calculatedMarks}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span>
-                  Quiz total marks
-                </span>
-
-                <span className="font-medium">
-                  {
-                    form.quizData
-                      .totalMarks
-                  }
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span>
-                  Passing marks
-                </span>
-
-                <span className="font-medium">
-                  {
-                    form.quizData
-                      .passingMarks
-                  }
-                </span>
-              </div>
-
-              {calculatedMarks !==
-                form.quizData
-                  .totalMarks && (
-                <p className="mt-3 text-sm text-destructive">
-                  Question marks must
-                  equal the quiz total
-                  marks.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+          )}
       </div>
 
-      {/* ------------------------------------------ */}
-      {/* Submit */}
-      {/* ------------------------------------------ */}
+      {/* =====================================================
+          SUBMIT
+      ===================================================== */}
 
       <Button
         type="submit"

@@ -43,6 +43,7 @@ export type ChapterType = "video" | "pdf" | "quiz"|null;
 export interface QuizQuestion {
   question: string;
   options: string[];
+  image?:string;
   answer: string;
   marks: number;
 }
@@ -64,7 +65,9 @@ export interface CreateChapter {
 export interface QuizQuestion {
   _id: string;
   question: string;
+  image?: string;
   options: string[];
+  answer: string;
   marks: number;
 }
 

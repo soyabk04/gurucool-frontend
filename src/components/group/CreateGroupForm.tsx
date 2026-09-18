@@ -4,7 +4,6 @@ import {
   UserRound,
   Hash,
   Mail,
-  IdCard,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,7 +20,6 @@ export default function CreateGroup() {
     groupCode: "",
     coordinatorName: "",
     coordinatorEmail: "",
-    coordinatorId: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -53,10 +51,7 @@ export default function CreateGroup() {
       return;
     }
 
-    if (!form.coordinatorId.trim()) {
-      toast.error("Coordinator ID is required");
-      return;
-    }
+
 
     if (!form.coordinatorEmail.trim()) {
       toast.error("Coordinator email is required");
@@ -74,7 +69,6 @@ export default function CreateGroup() {
             {
               name: form.coordinatorName.trim(),
               email: form.coordinatorEmail.trim(),
-              ID: form.coordinatorId.trim(),
               role: "coordinator",
             },
           ],
@@ -93,7 +87,6 @@ export default function CreateGroup() {
           groupCode: "",
           coordinatorName: "",
           coordinatorEmail: "",
-          coordinatorId: "",
         });
       } else {
         toast.error(
@@ -251,29 +244,10 @@ export default function CreateGroup() {
                 </div>
               </div>
 
-              {/* Employee ID */}
-              <div className="space-y-2">
-                <Label htmlFor="coordinatorId">
-                  Employee ID
-                </Label>
 
-                <div className="relative">
-                  <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-                  <Input
-                    id="coordinatorId"
-                    name="coordinatorId"
-                    value={form.coordinatorId}
-                    onChange={handleChange}
-                    placeholder="EMP001"
-                    disabled={loading}
-                    className="pl-9"
-                  />
-                </div>
-              </div>
 
               {/* Email */}
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2 md:col-span-1">
                 <Label htmlFor="coordinatorEmail">
                   Email Address
                 </Label>

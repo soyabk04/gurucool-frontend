@@ -24,38 +24,51 @@ export default function CourseSelect({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const response = await getCourses();
+
+        console.log("COURSE RESPONSE:", response);
+
+        const courseList = response?.res ?? [];
+
+        setCourses(courseList);
+      } catch (error) {
+        console.error("Failed to load courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadCourses();
   }, []);
 
-  const loadCourses = async () => {
-    try {
-      const data = await getCourses();
-      console.log(data)
-      setCourses(data.res);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-// console.log(courses)
+  // Find selected course from ID
+  const selectedCourse = courses.find(
+    (course) => String(course._id) === String(value)
+  );
+
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select
+      value={value ? String(value) : undefined}
+      onValueChange={(courseId) => {
+        onChange(courseId);
+      }}
+      disabled={loading}
+    >
       <SelectTrigger className="w-full">
-        <SelectValue
-          placeholder={
-            loading
-              ? "Loading courses..."
-              : "Select a course"
-          }
-        />
+        <SelectValue>
+          {loading
+            ? "Loading courses..."
+            : selectedCourse?.title || "Select a course"}
+        </SelectValue>
       </SelectTrigger>
 
       <SelectContent>
         {courses.map((course) => (
           <SelectItem
-            key={course._id}
-            value={course._id}
+            key={String(course._id)}
+            value={String(course._id)}
           >
             {course.title}
           </SelectItem>

@@ -22,14 +22,13 @@ export default function CreatedUsersTable({ users }: Props) {
       </div>
     );
   }
-
+console.log(users)
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
-          <TableHead>Employee ID</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Group</TableHead>
           <TableHead>Status</TableHead>
@@ -42,8 +41,6 @@ export default function CreatedUsersTable({ users }: Props) {
             <TableCell>{user.name}</TableCell>
 
             <TableCell>{user.email}</TableCell>
-
-            <TableCell>{user.ID}</TableCell>
 
             <TableCell className="capitalize">
               {user.role}

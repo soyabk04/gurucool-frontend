@@ -35,7 +35,6 @@ export default function FailedUsersTable({ users }: Props) {
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
-          <TableHead>Employee ID</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Group</TableHead>
           <TableHead>Error</TableHead>
@@ -49,7 +48,6 @@ export default function FailedUsersTable({ users }: Props) {
 
             <TableCell>{item.user.email}</TableCell>
 
-            <TableCell>{item.user.ID}</TableCell>
 
             <TableCell className="capitalize">
               {item.user.role}

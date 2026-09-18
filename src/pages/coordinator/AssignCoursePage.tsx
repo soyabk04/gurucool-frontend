@@ -245,8 +245,11 @@ export default function AssignCoursePage() {
 
         <CourseSelect
           value={selectedCourse}
-          onChange={(value) =>
-            setSelectedCourse(value ?? "")
+          onChange={(value) =>{
+            console.log(value)
+            setSelectedCourse(value ?? "");
+
+          }
           }
         />
       </div>

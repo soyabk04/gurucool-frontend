@@ -94,7 +94,7 @@ export default function GroupCourseTable() {
                   </TableCell>
 
                   <TableCell>
-                    {assignment.courseId.title}
+                    {assignment.courseId?.title??''}
                   </TableCell>
 
                   <TableCell>

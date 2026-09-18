@@ -48,39 +48,31 @@ export default function CourseSelect({
     <div className="space-y-2">
       <Label htmlFor="course">Course</Label>
 
-      <Select
-        value={value}
-        onValueChange={(value) => {
-          if (value !== null) {
-            onChange(value);
-          }
-        }}
-      >
-        <SelectTrigger id="course" className="w-full">
-          <SelectValue
-            placeholder={
-              loading ? "Loading courses..." : "Select a course"
-            }
-          />
-        </SelectTrigger>
+   <Select
+  value={value ?? ""}
+  onValueChange={(selectedValue) => {
+    if (selectedValue !== null) {
+      onChange(selectedValue);
+    }
+  }}
+>
+  <SelectTrigger id="course" className="w-full">
+    <SelectValue
+      placeholder={loading ? "Loading courses..." : "Select a course"}
+    />
+  </SelectTrigger>
 
-        <SelectContent>
-          {courses.length === 0 ? (
-            <SelectItem value="no-course" disabled>
-              No courses found
-            </SelectItem>
-          ) : (
-            courses.map((course) => (
-              <SelectItem
-                key={course.courseId._id}
-                value={course.courseId._id}
-              >
-                {course.courseId.title}
-              </SelectItem>
-            ))
-          )}
-        </SelectContent>
-      </Select>
+  <SelectContent>
+    {courses.map((course) => (
+      <SelectItem
+        key={course.courseId._id}
+        value={course.courseId._id}
+      >
+        {course.courseId.title}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
     </div>
   );
 }
